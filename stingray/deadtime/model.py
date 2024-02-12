@@ -188,10 +188,6 @@ def check_B(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
         plt.close(fig)
 
 
-def find_ideal_limit_k(rate, td, tb, max_k=1000, threshold=0.0001):
-    """Find the ideal limit_k for the B and A function."""
-
-
 @njit(parallel=True)
 def _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=60):
     """Calculate the power spectrum, as per Eq. 44 in Zhang+95."""
