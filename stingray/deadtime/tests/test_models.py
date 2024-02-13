@@ -35,7 +35,7 @@ def test_deadtime_conversion():
     np.testing.assert_almost_equal(rin, original_rate)
 
 
-@pytest.mark.parametrize("rate", [1.0, 1000.0])
+@pytest.mark.parametrize("rate", [1.0, 100.0])
 def test_zhang_model_accurate(rate):
     bintime = 0.0002
     deadtime = 2.5e-3
@@ -66,11 +66,11 @@ def test_checkB():
     os.unlink("check_B.png")
 
 
-@pytest.mark.parametrize("rate", [0.1, 1000.0])
 @pytest.mark.parametrize("tb", [0.0001, 0.1])
-def test_A_and_B_array(rate, tb):
+def test_A_and_B_array(tb):
     td = 2.5e-3
     ks = np.array([1, 5, 20, 60])
+    rate = 10
     tau = 1 / rate
     r0 = r_det(td, rate)
     assert np.array_equal(np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau))

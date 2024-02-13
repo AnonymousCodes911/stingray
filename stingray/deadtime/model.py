@@ -93,7 +93,7 @@ def Gn(x, n):
 
         s += new_val
         # The curve above has a maximum around x~l
-        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
+        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val)) > PRECISION:
             break
 
     return s
