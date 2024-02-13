@@ -73,7 +73,6 @@ def test_A_and_B_array(rate, tb):
     ks = np.array([1, 5, 20, 60])
     tau = 1 / rate
     r0 = r_det(td, rate)
-    print(ks * tb / tau)
     assert np.array_equal(np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau))
     assert np.array_equal(np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau))
 
