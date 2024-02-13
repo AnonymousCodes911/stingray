@@ -46,7 +46,7 @@ def test_zhang_model_accurate(rate):
     lc_dt = Lightcurve.make_lightcurve(events_dt, bintime, tstart=0, tseg=length)
     pds = AveragedPowerspectrum(lc_dt, fftlen, norm="leahy")
 
-    zh_f, zh_p = pds_model_zhang(1000, rate, deadtime, bintime, limit_k=600)
+    zh_f, zh_p = pds_model_zhang(100, rate, deadtime, bintime, limit_k=600)
 
     deadtime_fun = interp1d(zh_f, zh_p, bounds_error=False, fill_value="extrapolate")
     ratio = pds.power / deadtime_fun(pds.freq)
@@ -73,10 +73,14 @@ def test_A_and_B_array(tb):
     rate = 10
     tau = 1 / rate
     r0 = r_det(td, rate)
-    assert np.array_equal(np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau))
-    assert np.array_equal(np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau))
+    assert np.array_equal(
+        np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau), equal_nan=True
+    )
+    assert np.array_equal(
+        np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau), equal_nan=True
+    )
 
 
 def test_pds_model_warns():
     with pytest.warns(UserWarning, match="The bin time is much larger than the "):
-        pds_model_zhang(10, 100.0, 2.5e-3, 1, limit_k=10)
+        pds_model_zhang(10, 100.0, 2.5e-3, 0.1, limit_k=10)

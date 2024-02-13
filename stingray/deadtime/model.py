@@ -64,7 +64,7 @@ def e_m_x_x_over_factorial(x, m):
         return 1.0
 
     # For decently small numbers, use the direct formula
-    if m * np.log10(x) < 50:
+    if m < 50 or (x > 1 and m * max(np.log10(x), 1) < 50):
         return np.exp(-x) * x**m * __INVERSE_FACTORIALS[m]
 
     # Use Stirling's approximation
@@ -93,7 +93,7 @@ def Gn(x, n):
 
         s += new_val
         # The curve above has a maximum around x~l
-        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val)) > PRECISION:
+        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
             break
 
     return s
@@ -126,8 +126,7 @@ def h(k, n, td, tb, tau):
         return 0.0
 
     val = k - n * (td + tau) / tb + tau / tb * Gn(factor / tau, n)
-    # if factor == 0:
-    #     print("h", k, n, td, tb, tau, factor, val)
+
     return val
 
 
@@ -306,8 +305,11 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60):
     logger.info("Calculating PDS model (update)")
     P = _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=limit_k)
 
-    if tb > 100 * td:
-        warnings.warn(f"The bin time is much larger than the dead time. tb={tb / td:.2f} * td")
+    if tb > 10 * td:
+        warnings.warn(
+            f"The bin time is much larger than the dead time. "
+            f" Calculations might be slow. tb={tb / td:.2f} * td"
+        )
 
     maxf = 0.5 / tb
     df = maxf / len(P)
