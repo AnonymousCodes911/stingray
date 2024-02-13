@@ -19,18 +19,18 @@ STERLING_PARAMETERS = np.array([1 / 12, 1 / 288, -139 / 51840, -571 / 2488320])
 
 
 @njit()
-def sterling_factor(l):
+def sterling_factor(m):
     return (
         1
-        + STERLING_PARAMETERS[0] / l
-        + STERLING_PARAMETERS[1] / l**2
-        + STERLING_PARAMETERS[2] / l**3
-        + STERLING_PARAMETERS[3] / l**4
+        + STERLING_PARAMETERS[0] / m
+        + STERLING_PARAMETERS[1] / m**2
+        + STERLING_PARAMETERS[2] / m**3
+        + STERLING_PARAMETERS[3] / m**4
     )
 
 
 @njit()
-def e_m_x_x_over_factorial(x, l):
+def e_m_x_x_over_factorial(x, m):
     r"""Approximate the large number ratio in Eq. 34.
 
     The original formula for :math:`G_n` (eq. 34 in Zhang+95) has factors of the kind
@@ -48,26 +48,26 @@ def e_m_x_x_over_factorial(x, l):
 
     .. math::
 
-       \frac{e^{-x} x^l}{l!} \approx \frac{1}{A(l)\sqrt{2\pi l}} \left(\frac{x e}{l}\right)^l e^{-x}
+       \frac{e^{-x} x^l}{l!} \approx \frac{1}{A(l)\sqrt{2\pi l}}\left(\frac{x e}{l}\right)^l e^{-x}
 
     and then, bringing the exponential into the parenthesis
 
     .. math::
 
-       \frac{e^{-x} x^l}{l!} \approx \frac{1}{A(l)\sqrt{2\pi l}} \left(\frac{x e^{1-x/l}}{l}\right)^l
+       \frac{e^{-x} x^l}{l!}\approx\frac{1}{A(l)\sqrt{2\pi l}} \left(\frac{x e^{1-x/l}}{l}\right)^l
 
     The function inside the brackets has a maximum around :math:`x \approx l` and is well-behaved,
     allowing to approximate the product for large :math:`l` without the need to calculate the
     factorial or the exponentials directly.
     """
-    if x == 0.0 and l == 0:
+    if x == 0.0 and m == 0:
         return 1.0
 
-    if l < 100:
-        return np.exp(-x) * x**l * __INVERSE_FACTORIALS[l]
+    if m < 100:
+        return np.exp(-x) * x**m * __INVERSE_FACTORIALS[m]
 
     # Use Stirling's approximation
-    return 1.0 / np.sqrt(TWOPI * l) * np.power(x * np.exp(1 - x / l) / l, l) / sterling_factor(l)
+    return 1.0 / np.sqrt(TWOPI * m) * np.power(x * np.exp(1 - x / m) / m, m) / sterling_factor(m)
 
 
 def r_in(td, r_0):
@@ -87,12 +87,12 @@ def Gn(x, n):
     """Term in Eq. 34 in Zhang+95."""
     s = 0.0
 
-    for l in range(0, n):
-        new_val = e_m_x_x_over_factorial(x, l) * (n - l)
+    for m in range(0, n):
+        new_val = e_m_x_x_over_factorial(x, m) * (n - m)
 
         s += new_val
         # The curve above has a maximum around x~l
-        if x != 0 and l > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
+        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
             break
 
     return s
