@@ -63,7 +63,8 @@ def e_m_x_x_over_factorial(x, m):
     if x == 0.0 and m == 0:
         return 1.0
 
-    if m < 100:
+    # For decently small numbers, use the direct formula
+    if m * np.log10(x) < 100:
         return np.exp(-x) * x**m * __INVERSE_FACTORIALS[m]
 
     # Use Stirling's approximation

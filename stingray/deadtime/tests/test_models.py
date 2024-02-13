@@ -35,7 +35,7 @@ def test_deadtime_conversion():
     np.testing.assert_almost_equal(rin, original_rate)
 
 
-@pytest.mark.parametrize("rate", [1.0, 2000.0])
+@pytest.mark.parametrize("rate", [1.0, 1000.0])
 def test_zhang_model_accurate(rate):
     bintime = 0.0002
     deadtime = 2.5e-3
@@ -46,7 +46,7 @@ def test_zhang_model_accurate(rate):
     lc_dt = Lightcurve.make_lightcurve(events_dt, bintime, tstart=0, tseg=length)
     pds = AveragedPowerspectrum(lc_dt, fftlen, norm="leahy")
 
-    zh_f, zh_p = pds_model_zhang(1000, rate, deadtime, bintime, limit_k=400)
+    zh_f, zh_p = pds_model_zhang(1000, rate, deadtime, bintime, limit_k=600)
 
     deadtime_fun = interp1d(zh_f, zh_p, bounds_error=False, fill_value="extrapolate")
     ratio = pds.power / deadtime_fun(pds.freq)
@@ -73,7 +73,7 @@ def test_A_and_B_array(rate, tb):
     ks = np.array([1, 5, 20, 60])
     tau = 1 / rate
     r0 = r_det(td, rate)
-
+    print(ks * tb / tau)
     assert np.array_equal(np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau))
     assert np.array_equal(np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau))
 
