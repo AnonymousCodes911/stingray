@@ -1,3 +1,4 @@
+import warnings
 from stingray.utils import njit, prange
 
 from stingray.loggingconfig import setup_logger
@@ -8,7 +9,23 @@ import matplotlib.pyplot as plt
 from scipy.special import factorial
 
 
-__FACTORIALS = factorial(np.arange(700))
+MAX_FACTORIAL = 100
+__INVERSE_FACTORIALS = 1.0 / factorial(np.arange(MAX_FACTORIAL))
+PRECISION = np.finfo(float).precision
+TWOPI = np.pi * 2
+
+
+@njit()
+def e_m_x_x_over_factorial(x, l):
+    if x == 0.0 and l == 0:
+        return 1.0
+
+    if l < 10:
+        return np.exp(-x) * x**l * __INVERSE_FACTORIALS[l]
+
+    # Use Stirling's approximation
+    return 1.0 / np.sqrt(TWOPI * l) * np.power(x * np.exp(1 - x / l) / l, l)
+
 
 logger = setup_logger()
 
@@ -25,20 +42,26 @@ def r_det(td, r_i):
     return 1.0 / (tau + td)
 
 
-PRECISION = np.finfo(float).precision
-
-
 @njit()
 def Gn(x, n):
     """Term in Eq. 34 in Zhang+95."""
     s = 0.0
-    for l in range(0, n):
-        new_val = (n - l) / __FACTORIALS[l] * x**l
-        if -np.log10(new_val) > PRECISION:
-            break
-        s += new_val
 
-    return np.exp(-x) * s
+    # if x == 0.0:
+    #     return 1.0
+
+    for l in range(0, n):
+        new_val = e_m_x_x_over_factorial(x, l) * (n - l)
+
+        s += new_val
+        # The curve above has a maximum around x~l
+        if x != 0 and l > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
+            break
+    # if x != 0:
+    #     print("BuGn", l, n, "x", x, s, new_val, -np.log10(np.abs(new_val / s)), new_val / s)
+    # else:
+    #     print("BuGn", l, n, "x", x, s, new_val)
+    return s
 
 
 @njit()
@@ -62,14 +85,18 @@ def heaviside(x):
 def h(k, n, td, tb, tau):
     """Term in Eq. 35 in Zhang+95."""
     # Typo in Zhang+95 corrected. k * tb, not k * td
-    if k * tb < n * td:
-        return 0.0
     factor = k * tb - n * td
+
+    if factor < 0:
+        return 0.0
+
     val = k - n * (td + tau) / tb + tau / tb * Gn(factor / tau, n)
+    # if factor == 0:
+    #     print("h", k, n, td, tb, tau, factor, val)
     return val
 
 
-INFINITE = 100
+INFINITE = 699
 
 
 @njit()
@@ -89,11 +116,10 @@ def A_single_k(k, r0, td, tb, tau):
         return A0(r0, td, tb, tau)
     # Equation 39
     s = 0.0
-    for n in range(1, INFINITE * 1000):
+    for n in range(1, int(max(1, (k + 2) * tb / td)) * 3):
         new_val = h(k + 1, n, td, tb, tau) - 2 * h(k, n, td, tb, tau) + h(k - 1, n, td, tb, tau)
+
         s += new_val
-        if (n > k * tb / td) and -np.log10(new_val) > PRECISION:
-            break
 
     return r0 * tb * s
 
@@ -102,6 +128,7 @@ def A(k, r0, td, tb, tau):
     """Term in Eq. 39 in Zhang+95."""
     if isinstance(k, Iterable):
         return np.array([A_single_k(ki, r0, td, tb, tau) for ki in k])
+
     return A_single_k(k, r0, td, tb, tau)
 
 
@@ -134,6 +161,7 @@ def check_A(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
     if save_to is not None:
         plt.savefig(save_to)
         plt.close(fig)
+    return k_values, A_values
 
 
 @njit()
@@ -194,13 +222,15 @@ def _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=60):
     P = np.zeros(N // 2)
     for j in prange(N // 2):
         eq8_sum = 0
-        for k in range(1, N):
-            eq8_sum += (
+        for k in range(1, min(N, limit_k)):
+            new_val = (
                 (N - k)
                 / N
                 * safe_B_single_k(k, r0, td, tb, tau, limit_k=limit_k)
                 * np.cos(2 * np.pi * j * k / N)
             )
+
+            eq8_sum += new_val
 
         P[j] = safe_B_single_k(0, r0, td, tb, tau) + eq8_sum
 
@@ -240,6 +270,9 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60):
     # Nph = N / tau
     logger.info("Calculating PDS model (update)")
     P = _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=limit_k)
+
+    if tb > 100 * td:
+        warnings.warn(f"The bin time is much larger than the dead time. tb={tb / td:.2f} * td")
 
     maxf = 0.5 / tb
     df = maxf / len(P)

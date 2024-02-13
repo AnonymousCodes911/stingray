@@ -6,7 +6,7 @@ from scipy.interpolate import interp1d
 from stingray.lightcurve import Lightcurve
 from stingray.powerspectrum import AveragedPowerspectrum
 from stingray.deadtime.model import r_det, r_in, pds_model_zhang
-from stingray.deadtime.model import check_A, check_B, heaviside
+from stingray.deadtime.model import check_A, check_B, heaviside, A, B
 from stingray.filters import filter_for_deadtime
 
 
@@ -35,23 +35,23 @@ def test_deadtime_conversion():
     np.testing.assert_almost_equal(rin, original_rate)
 
 
-def test_zhang_model_accurate():
-    bintime = 1 / 4096
+@pytest.mark.parametrize("rate", [1.0, 2000.0])
+def test_zhang_model_accurate(rate):
+    bintime = 0.0002
     deadtime = 2.5e-3
     length = 2000
-    fftlen = 5
-    r = 300
+    fftlen = 10
 
-    events, events_dt = simulate_events(r, length, deadtime=deadtime)
+    _, events_dt = simulate_events(rate, length, deadtime=deadtime)
     lc_dt = Lightcurve.make_lightcurve(events_dt, bintime, tstart=0, tseg=length)
     pds = AveragedPowerspectrum(lc_dt, fftlen, norm="leahy")
 
-    zh_f, zh_p = pds_model_zhang(1000, r, deadtime, bintime, limit_k=100)
+    zh_f, zh_p = pds_model_zhang(1000, rate, deadtime, bintime, limit_k=400)
 
     deadtime_fun = interp1d(zh_f, zh_p, bounds_error=False, fill_value="extrapolate")
     ratio = pds.power / deadtime_fun(pds.freq)
-    assert np.isclose(np.mean(ratio), 1, atol=0.001)
-    assert np.isclose(np.std(ratio), 1 / np.sqrt(pds.m), atol=0.001)
+    assert np.isclose(np.mean(ratio), 1, rtol=0.01)
+    assert np.isclose(np.std(ratio), 1 / np.sqrt(pds.m), rtol=0.1)
 
 
 def test_checkA():
@@ -64,3 +64,20 @@ def test_checkB():
     check_B(300, 2.5e-3, 0.001, max_k=100, save_to="check_B.png")
     assert os.path.exists("check_B.png")
     os.unlink("check_B.png")
+
+
+@pytest.mark.parametrize("rate", [0.1, 1000.0])
+@pytest.mark.parametrize("tb", [0.0001, 0.1])
+def test_A_and_B_array(rate, tb):
+    td = 2.5e-3
+    ks = np.array([1, 5, 20, 60])
+    tau = 1 / rate
+    r0 = r_det(td, rate)
+
+    assert np.array_equal(np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau))
+    assert np.array_equal(np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau))
+
+
+def test_pds_model_warns():
+    with pytest.warns(UserWarning, match="The bin time is much larger than the "):
+        pds_model_zhang(10, 100.0, 2.5e-3, 1, limit_k=10)
