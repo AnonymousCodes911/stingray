@@ -8,26 +8,66 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import factorial
 
+logger = setup_logger()
 
 MAX_FACTORIAL = 100
 __INVERSE_FACTORIALS = 1.0 / factorial(np.arange(MAX_FACTORIAL))
 PRECISION = np.finfo(float).precision
 TWOPI = np.pi * 2
 
+STERLING_PARAMETERS = np.array([1 / 12, 1 / 288, -139 / 51840, -571 / 2488320])
+
+
+@njit()
+def sterling_factor(l):
+    return (
+        1
+        + STERLING_PARAMETERS[0] / l
+        + STERLING_PARAMETERS[1] / l**2
+        + STERLING_PARAMETERS[2] / l**3
+        + STERLING_PARAMETERS[3] / l**4
+    )
+
 
 @njit()
 def e_m_x_x_over_factorial(x, l):
+    r"""Approximate the large number ratio in Eq. 34.
+
+    The original formula for :math:`G_n` (eq. 34 in Zhang+95) has factors of the kind
+    :math:`e^{-x} x^l / l!`. This is the product of very large numbers, that mostly
+    balance each other. In this function, we approximate this product for large :math:`l`
+    starting from Stirling's approximation for the factorial:
+
+    .. math::
+
+       l! \approx \sqrt{2\pi l} (\frac{l}{e})^l A(l)
+
+    where :math:`A(l)` is a series expansion in 1/l of the form
+    :math:`1 + 1 / 12l + 1 / 288l^2 - 139/51840/l^3 + ...`. This allows to transform the product
+    above into
+
+    .. math::
+
+       \frac{e^{-x} x^l}{l!} \approx \frac{1}{A(l)\sqrt{2\pi l}} \left(\frac{x e}{l}\right)^l e^{-x}
+
+    and then, bringing the exponential into the parenthesis
+
+    .. math::
+
+       \frac{e^{-x} x^l}{l!} \approx \frac{1}{A(l)\sqrt{2\pi l}} \left(\frac{x e^{1-x/l}}{l}\right)^l
+
+    The function inside the brackets has a maximum around :math:`x \approx l` and is well-behaved,
+    allowing to approximate the product for large :math:`l` without the need to calculate the
+    factorial or the exponentials directly.
+    """
     if x == 0.0 and l == 0:
         return 1.0
 
-    if l < 10:
+    if l < 100:
         return np.exp(-x) * x**l * __INVERSE_FACTORIALS[l]
 
     # Use Stirling's approximation
-    return 1.0 / np.sqrt(TWOPI * l) * np.power(x * np.exp(1 - x / l) / l, l)
-
-
-logger = setup_logger()
+    return 1.0 / np.sqrt(TWOPI * l) * np.power(x * np.exp(1 - x / l) / l, l) / sterling_factor(l)
 
 
 def r_in(td, r_0):
@@ -47,9 +87,6 @@ def Gn(x, n):
     """Term in Eq. 34 in Zhang+95."""
     s = 0.0
 
-    # if x == 0.0:
-    #     return 1.0
-
     for l in range(0, n):
         new_val = e_m_x_x_over_factorial(x, l) * (n - l)
 
@@ -57,10 +94,7 @@ def Gn(x, n):
         # The curve above has a maximum around x~l
         if x != 0 and l > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
             break
-    # if x != 0:
-    #     print("BuGn", l, n, "x", x, s, new_val, -np.log10(np.abs(new_val / s)), new_val / s)
-    # else:
-    #     print("BuGn", l, n, "x", x, s, new_val)
+
     return s
 
 
@@ -87,7 +121,7 @@ def h(k, n, td, tb, tau):
     # Typo in Zhang+95 corrected. k * tb, not k * td
     factor = k * tb - n * td
 
-    if factor < 0:
+    if k * tb - n * td < 0:
         return 0.0
 
     val = k - n * (td + tau) / tb + tau / tb * Gn(factor / tau, n)
@@ -103,7 +137,7 @@ INFINITE = 699
 def A0(r0, td, tb, tau):
     """Term in Eq. 38 in Zhang+95."""
     s = 0.0
-    for n in range(1, INFINITE):
+    for n in range(1, int(max(1, tb / td + 1))):
         s += h(1, n, td, tb, tau)
 
     return r0 * tb * (1 + 2 * s)
