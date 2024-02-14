@@ -295,9 +295,12 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60, rate_is_incident=True):
     power : array of floats
         Power spectrum
     """
-    tau = 1 / rate
-
-    r0 = r_det(td, rate) if rate_is_incident else rate
+    if rate_is_incident:
+        tau = 1 / rate
+        r0 = r_det(td, rate)
+    else:
+        r0 = rate
+        tau = 1 / r_in(td, rate)
 
     # Nph = N / tau
     logger.info("Calculating PDS model (update)")
@@ -365,9 +368,14 @@ def non_paralyzable_dead_time_model(
 
     n_bins = n_approx if n_approx is not None else np.size(freqs)
 
-    # Nph = N / tau
-    logger.info("Calculating PDS model (update)")
-    zh_f, zh_p = pds_model_zhang(n_bins, rate, dead_time, bin_time, limit_k=limit_k)
+    zh_f, zh_p = pds_model_zhang(
+        int(n_bins),
+        (rate + background_rate),
+        dead_time,
+        bin_time,
+        limit_k=limit_k,
+        rate_is_incident=False,
+    )
 
     # Rescale by the source rate wrt background rate
     if background_rate > 0:
