@@ -30,14 +30,14 @@ __all__ = [
 
 
 @njit()
-def sterling_factor(m):
-    return (
-        1
-        + STERLING_PARAMETERS[0] / m
-        + STERLING_PARAMETERS[1] / m**2
-        + STERLING_PARAMETERS[2] / m**3
-        + STERLING_PARAMETERS[3] / m**4
-    )
+def _stirling_factor(m):
+    """First few terms of series expansion appearing in Stirling's approximation."""
+    fact = 1.0
+    power = 1.0
+    for i in range(1, 5):
+        power *= m
+        fact += STERLING_PARAMETERS[i - 1] / power
+    return fact
 
 
 @njit()
@@ -79,7 +79,7 @@ def e_m_x_x_over_factorial(x, m):
         return np.exp(-x) * x**m * __INVERSE_FACTORIALS[m]
 
     # Use Stirling's approximation
-    return 1.0 / np.sqrt(TWOPI * m) * np.power(x * np.exp(1 - x / m) / m, m) / sterling_factor(m)
+    return 1.0 / np.sqrt(TWOPI * m) * np.power(x * np.exp(1 - x / m) / m, m) / _stirling_factor(m)
 
 
 def r_in(td, r_0):
