@@ -5,7 +5,7 @@ from scipy.interpolate import interp1d
 
 from stingray.lightcurve import Lightcurve
 from stingray.powerspectrum import AveragedPowerspectrum
-from stingray.deadtime.model import r_det, r_in, pds_model_zhang
+from stingray.deadtime.model import r_det, r_in, pds_model_zhang, non_paralyzable_dead_time_model
 from stingray.deadtime.model import check_A, check_B, heaviside, A, B
 from stingray.filters import filter_for_deadtime
 
@@ -19,10 +19,16 @@ def test_heaviside():
     assert heaviside(-1) == 0
 
 
-def simulate_events(rate, length, deadtime=2.5e-3, **filter_kwargs):
+def simulate_events(rate, length, deadtime=2.5e-3, bkg_rate=0.0, **filter_kwargs):
     events = np.random.uniform(0, length, int(rate * length))
+
     events = np.sort(events)
-    events_dt = filter_for_deadtime(events, deadtime, **filter_kwargs)
+
+    events_back = None
+    if bkg_rate > 0:
+        events_back = np.sort(np.random.uniform(0, length, int(rate * length)))
+
+    events_dt = filter_for_deadtime(events, deadtime, bkg_ev_list=events_back, **filter_kwargs)
     return events, events_dt
 
 
@@ -54,6 +60,27 @@ def test_zhang_model_accurate(rate):
     assert np.isclose(np.std(ratio), 1 / np.sqrt(pds.m), rtol=0.1)
 
 
+@pytest.mark.parametrize("rates", [(1.0, 0.0), (1.0, 1.0), (100.0, 10.0), (100, 200)])
+def test_non_paralyzable_model_accurate(rates):
+    bintime = 0.0002
+    deadtime = 2.5e-3
+    length = 2000
+    fftlen = 10
+    rate, bkg_rate = rates
+    events, events_dt = simulate_events(rate, length, deadtime=deadtime, bkg_rate=bkg_rate)
+    det_rate = events_dt.size / length
+    det_bkg_rate = events.size / length - det_rate
+
+    lc_dt = Lightcurve.make_lightcurve(events_dt, bintime, tstart=0, tseg=length)
+    pds = AveragedPowerspectrum(lc_dt, fftlen, norm="leahy")
+
+    model_power = non_paralyzable_dead_time_model(
+        pds.freq, deadtime, rate=det_rate, background_rate=det_bkg_rate
+    )
+    ratio = pds.power / model_power
+    assert np.isclose(np.mean(ratio), 1, rtol=0.01)
+
+
 def test_checkA():
     check_A(300, 2.5e-3, 0.001, max_k=100, save_to="check_A.png")
     assert os.path.exists("check_A.png")
@@ -74,10 +101,10 @@ def test_A_and_B_array(tb):
     tau = 1 / rate
     r0 = r_det(td, rate)
     assert np.array_equal(
-        np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau), equal_nan=True
+        np.array([A(k, r0, td, tb, tau) for k in ks]), A(ks, r0, td, tb, tau), equal_nan=False
     )
     assert np.array_equal(
-        np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau), equal_nan=True
+        np.array([B(k, r0, td, tb, tau) for k in ks]), B(ks, r0, td, tb, tau), equal_nan=False
     )
 
 

@@ -7,6 +7,7 @@ from collections.abc import Iterable
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.special import factorial
+from scipy.interpolate import interp1d
 
 logger = setup_logger()
 
@@ -271,7 +272,7 @@ def _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=60):
     return P
 
 
-def pds_model_zhang(N, rate, td, tb, limit_k=60):
+def pds_model_zhang(N, rate, td, tb, limit_k=60, rate_is_incident=True):
     """Calculate the dead-time-modified power spectrum.
 
     Parameters
@@ -291,6 +292,9 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60):
         Limit to this value the number of terms in the inner loops of
         calculations. Check the plots returned by  the `check_B` and
         `check_A` functions to test that this number is adequate.
+    rate_is_incident : bool, default True
+        If True, the input rate is the incident count rate. If False, it is the
+        detected count rate.
 
     Returns
     -------
@@ -300,7 +304,9 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60):
         Power spectrum
     """
     tau = 1 / rate
-    r0 = r_det(td, rate)
+
+    r0 = r_det(td, rate) if rate_is_incident else rate
+
     # Nph = N / tau
     logger.info("Calculating PDS model (update)")
     P = _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=limit_k)
@@ -316,3 +322,64 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60):
     freqs = np.arange(0, maxf, df)
 
     return freqs, P
+
+
+def non_paralyzable_dead_time_model(
+    freqs,
+    dead_time,
+    rate,
+    bin_time=None,
+    limit_k=200,
+    background_rate=0.0,
+    n_approx=None,
+):
+    """Calculate the dead-time-modified power spectrum.
+
+    Parameters
+    ----------
+    freqs : array of floats
+        Frequency array
+    dead_time : float
+        Dead time
+    rate : float
+        Detected source count rate
+
+    Other Parameters
+    ----------------
+    bin_time : float
+        Bin time of the light curve
+    limit_k : int, default 200
+        Limit to this value the number of terms in the inner loops of
+        calculations. Check the plots returned by  the `check_B` and
+        `check_A` functions to test that this number is adequate.
+    background_rate : float, default 0
+        Detected background count rate. This is important to estimate when deadtime is given by the
+        combination of the source counts and background counts (e.g. in an imaging X-ray detector).
+    n_approx : int, default None
+        Number of bins to calculate the model power spectrum. If None, it will use the size of
+        the input frequency array. Relatively simple models (e.g., low count rates compared to
+        dead time) can use a smaller number of bins to speed up the calculation, and the final
+        power values will be interpolated.
+
+    Returns
+    -------
+    freqs : array of floats
+        Frequency array
+    power : array of floats
+        Power spectrum
+    """
+    if bin_time is None:
+        bin_time = 1 / (2 * max(freqs))
+
+    n_bins = n_approx if n_approx is not None else np.size(freqs)
+
+    # Nph = N / tau
+    logger.info("Calculating PDS model (update)")
+    zh_f, zh_p = pds_model_zhang(n_bins, rate, dead_time, bin_time, limit_k=limit_k)
+
+    # Rescale by the source rate wrt background rate
+    if background_rate > 0:
+        zh_p = (zh_p - 2) * rate / (rate + background_rate) + 2
+
+    pds_interp = interp1d(zh_f, zh_p, bounds_error=False, fill_value="extrapolate")
+    return pds_interp(freqs)
