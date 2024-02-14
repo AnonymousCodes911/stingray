@@ -18,6 +18,16 @@ TWOPI = np.pi * 2
 
 STERLING_PARAMETERS = np.array([1 / 12, 1 / 288, -139 / 51840, -571 / 2488320])
 
+__all__ = [
+    "r_det",
+    "r_in",
+    "pds_model_zhang",
+    "non_paralyzable_dead_time_model",
+    "check_A",
+    "check_B",
+    "heaviside",
+]
+
 
 @njit()
 def sterling_factor(m):
