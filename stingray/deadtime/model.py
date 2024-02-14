@@ -111,23 +111,6 @@ def Gn(x, n):
 
 
 @njit()
-def heaviside(x):
-    """Heaviside function. Returns 1 if x>0, and 0 otherwise.
-
-    Examples
-    --------
-    >>> heaviside(2)
-    1
-    >>> heaviside(-1)
-    0
-    """
-    if x >= 0:
-        return 1
-    else:
-        return 0
-
-
-@njit()
 def h(k, n, td, tb, tau):
     """Term in Eq. 35 in Zhang+95."""
     # Typo in Zhang+95 corrected. k * tb, not k * td
