@@ -6,17 +6,11 @@ from scipy.interpolate import interp1d
 from stingray.lightcurve import Lightcurve
 from stingray.powerspectrum import AveragedPowerspectrum
 from stingray.deadtime.model import r_det, r_in, pds_model_zhang, non_paralyzable_dead_time_model
-from stingray.deadtime.model import check_A, check_B, heaviside, A, B
+from stingray.deadtime.model import check_A, check_B, A, B
 from stingray.filters import filter_for_deadtime
 
 
 pytestmark = pytest.mark.slow
-
-
-def test_heaviside():
-    assert heaviside(2) == 1
-    assert heaviside(0) == 1
-    assert heaviside(-1) == 0
 
 
 def simulate_events(rate, length, deadtime=2.5e-3, bkg_rate=0.0, **filter_kwargs):
