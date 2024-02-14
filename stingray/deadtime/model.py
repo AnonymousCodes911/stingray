@@ -25,7 +25,6 @@ __all__ = [
     "non_paralyzable_dead_time_model",
     "check_A",
     "check_B",
-    "heaviside",
 ]
 
 
