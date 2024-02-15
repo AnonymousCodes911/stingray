@@ -8,6 +8,7 @@ from stingray.powerspectrum import AveragedPowerspectrum
 from stingray.deadtime.model import r_det, r_in, pds_model_zhang, non_paralyzable_dead_time_model
 from stingray.deadtime.model import check_A, check_B, A, B
 from stingray.filters import filter_for_deadtime
+from stingray.utils import HAS_NUMBA
 
 
 pytestmark = pytest.mark.slow
@@ -54,6 +55,7 @@ def test_zhang_model_accurate(rate):
     assert np.isclose(np.std(ratio), 1 / np.sqrt(pds.m), rtol=0.1)
 
 
+@pytest.mark.skipif("not HAS_NUMBA")
 @pytest.mark.parametrize("rates", [(1.0, 0.0), (1.0, 1.0), (100.0, 10.0), (100, 200)])
 def test_non_paralyzable_model_accurate(rates):
     bintime = 0.0002
