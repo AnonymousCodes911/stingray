@@ -181,6 +181,7 @@ def check_A(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
     A_values = A(k_values, r0, td, tb, tau)
 
     plt.plot(k_values, A_values - limit, color="k")
+    plt.semilogx()
     plt.yscale("symlog", linthresh=linthresh)
     plt.axhline(0, ls="--", color="k")
     plt.xlabel("$k$")
@@ -235,6 +236,7 @@ def check_B(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
     B_values = B(k_values, r0, td, tb, tau, limit_k=max_k)
     plt.plot(k_values, B_values, color="k")
     plt.axhline(0, ls="--", color="k")
+    plt.semilogx()
     plt.yscale("symlog", linthresh=linthresh)
     plt.xlabel("$k$")
     plt.ylabel("$B_k$")
