@@ -40,7 +40,7 @@ def _stirling_factor(m):
 
 
 @njit()
-def e_m_x_x_over_factorial(x, m):
+def e_m_x_x_over_factorial(x: float, m: int):
     r"""Approximate the large number ratio in Eq. 34.
 
     The original formula for :math:`G_n` (eq. 34 in Zhang+95) has factors of the kind
@@ -70,6 +70,9 @@ def e_m_x_x_over_factorial(x, m):
     allowing to approximate the product for large :math:`l` without the need to calculate the
     factorial or the exponentials directly.
     """
+    # Numerical errors occur when x is not a float
+    x = float(x)
+
     if x == 0.0 and m == 0:
         return 1.0
 
@@ -103,7 +106,7 @@ def Gn(x, n):
 
         s += new_val
         # The curve above has a maximum around x~l
-        if x != 0 and m > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
+        if x != 0 and s > 0 and m > 2 * x and -np.log10(np.abs(new_val / s)) > PRECISION:
             break
 
     return s
@@ -130,7 +133,7 @@ INFINITE = 699
 def A0(r0, td, tb, tau):
     """Term in Eq. 38 in Zhang+95."""
     s = 0.0
-    for n in range(1, int(max(1, tb / td + 1))):
+    for n in range(1, int(max(2, tb / td * 2 + 1))):
         s += h(1, n, td, tb, tau)
 
     return r0 * tb * (1 + 2 * s)
@@ -143,7 +146,8 @@ def A_single_k(k, r0, td, tb, tau):
         return A0(r0, td, tb, tau)
     # Equation 39
     s = 0.0
-    for n in range(1, int(max(1, (k + 2) * tb / td)) * 3):
+
+    for n in range(1, int(max(3, (k + 1) * tb / td * 2))):
         new_val = h(k + 1, n, td, tb, tau) - 2 * h(k, n, td, tb, tau) + h(k - 1, n, td, tb, tau)
 
         s += new_val
@@ -268,16 +272,12 @@ def _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=60):
     """Calculate the power spectrum, as per Eq. 44 in Zhang+95."""
     P = np.zeros(N // 2)
     for j in prange(N // 2):
-        eq8_sum = 0
-        for k in range(1, min(N, limit_k)):
-            new_val = (
-                (N - k)
-                / N
-                * safe_B_single_k(k, r0, td, tb, tau, limit_k=limit_k)
-                * np.cos(2 * np.pi * j * k / N)
-            )
+        eq8_sum = 0.0
 
-            eq8_sum += new_val
+        for k in range(1, min(N, limit_k)):
+            Bk = safe_B_single_k(k, r0, td, tb, tau, limit_k=limit_k)
+
+            eq8_sum += (N - k) / N * Bk * np.cos(2 * np.pi * j * k / N)
 
         P[j] = safe_B_single_k(0, r0, td, tb, tau) + eq8_sum
 
@@ -325,7 +325,6 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60, rate_is_incident=True):
     # Nph = N / tau
     logger.info("Calculating PDS model (update)")
     P = _inner_loop_pds_zhang(N, tau, r0, td, tb, limit_k=limit_k)
-
     if tb > 10 * td:
         warnings.warn(
             f"The bin time is much larger than the dead time. "
@@ -334,7 +333,7 @@ def pds_model_zhang(N, rate, td, tb, limit_k=60, rate_is_incident=True):
 
     maxf = 0.5 / tb
     df = maxf / len(P)
-    freqs = np.arange(0, maxf, df)
+    freqs = np.arange(len(P)) * df
 
     return freqs, P
 
@@ -383,20 +382,26 @@ def non_paralyzable_dead_time_model(
     power : array of floats
         Power spectrum
     """
+
+    if rate + background_rate > 1 / dead_time:
+        raise ValueError(
+            "The sum of the source and background count rates is larger than the inverse of the dead time. "
+            "This is not a physical situation. Please check your input."
+        )
+
     if bin_time is None:
         bin_time = 1 / (2 * max(freqs))
 
-    n_bins = n_approx if n_approx is not None else np.size(freqs)
+    n_bins = n_approx if n_approx is not None else max(max(freqs), 10)
 
     zh_f, zh_p = pds_model_zhang(
-        int(n_bins),
+        int(n_bins) * 2,
         (rate + background_rate),
         dead_time,
         bin_time,
         limit_k=limit_k,
         rate_is_incident=False,
     )
-
     # Rescale by the source rate wrt background rate
     if background_rate > 0:
         zh_p = (zh_p - 2) * rate / (rate + background_rate) + 2
