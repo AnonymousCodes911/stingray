@@ -165,14 +165,18 @@ def limit_A(rate, td, tb):
     return r0**2 * tb**2
 
 
-def check_A(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
+def check_A(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001, rate_is_incident=True):
     """Test that A is well-behaved.
 
     Check that Ak ->r0**2tb**2 for k->infty, as per Eq. 43 in
     Zhang+95.
     """
-    tau = 1 / rate
-    r0 = r_det(td, rate)
+    if rate_is_incident:
+        tau = 1 / rate
+        r0 = r_det(td, rate)
+    else:
+        r0 = rate
+        tau = 1 / r_in(td, rate)
 
     limit = limit_A(rate, td, tb)
     fig = plt.figure()
@@ -198,7 +202,9 @@ def B_raw(k, r0, td, tb, tau):
     if k == 0:
         return 2 * (A_single_k(0, r0, td, tb, tau) - r0**2 * tb**2) / (r0 * tb)
 
-    return 4 * (A_single_k(k, r0, td, tb, tau) - r0**2 * tb**2) / (r0 * tb)
+    new_val = A_single_k(k, r0, td, tb, tau) - r0**2 * tb**2
+
+    return 4 * new_val / (r0 * tb)
 
 
 @njit()
@@ -226,23 +232,35 @@ def B(k, r0, td, tb, tau, limit_k=60):
     return safe_B(k, r0, td, tb, tau, limit_k=limit_k)
 
 
-def check_B(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001):
+def check_B(rate, td, tb, max_k=100, save_to=None, linthresh=0.000001, rate_is_incident=True):
     """Check that B->0 for k->infty."""
-    tau = 1 / rate
-    r0 = r_det(td, rate)
+    if rate_is_incident:
+        tau = 1 / rate
+        r0 = r_det(td, rate)
+    else:
+        r0 = rate
+        tau = 1 / r_in(td, rate)
 
     fig = plt.figure()
-    k_values = np.arange(0, max_k + 1)
+    k_values = np.arange(1, max_k + 1)
     B_values = B(k_values, r0, td, tb, tau, limit_k=max_k)
-    plt.plot(k_values, B_values, color="k")
+    threshold = max(tb / td, 1) * 10.0 ** (3 * np.log10(k_values) - PRECISION)
+
+    plt.plot(k_values, threshold, label="Est. propagation of float errors", color="red")
+    plt.plot(k_values, -threshold, color="r")
+
+    plt.plot(k_values, B_values, color="k", ds="steps-mid")
     plt.axhline(0, ls="--", color="k")
     plt.semilogx()
     plt.yscale("symlog", linthresh=linthresh)
     plt.xlabel("$k$")
     plt.ylabel("$B_k$")
+    plt.xlim([0.9, max_k])
+    plt.legend()
     if save_to is not None:
         plt.savefig(save_to)
         plt.close(fig)
+    return k_values, B_values
 
 
 @njit(parallel=True)
