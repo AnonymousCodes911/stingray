@@ -77,14 +77,16 @@ def test_non_paralyzable_model_accurate(rates):
     assert np.isclose(np.mean(ratio), 1, rtol=0.01)
 
 
-def test_checkA():
-    check_A(300, 2.5e-3, 0.001, max_k=100, save_to="check_A.png")
+@pytest.mark.parametrize("is_incident", [True, False])
+def test_checkA(is_incident):
+    check_A(300, 2.5e-3, 0.001, max_k=100, save_to="check_A.png", rate_is_incident=is_incident)
     assert os.path.exists("check_A.png")
     os.unlink("check_A.png")
 
 
-def test_checkB():
-    check_B(300, 2.5e-3, 0.001, max_k=100, save_to="check_B.png")
+@pytest.mark.parametrize("is_incident", [True, False])
+def test_checkB(is_incident):
+    check_B(300, 2.5e-3, 0.001, max_k=100, save_to="check_B.png", rate_is_incident=is_incident)
     assert os.path.exists("check_B.png")
     os.unlink("check_B.png")
 
@@ -107,3 +109,12 @@ def test_A_and_B_array(tb):
 def test_pds_model_warns():
     with pytest.warns(UserWarning, match="The bin time is much larger than the "):
         pds_model_zhang(10, 100.0, 2.5e-3, 0.1, limit_k=10)
+
+
+def test_non_paralyzable_model_fail_bad_rate():
+    """Fail if combined rate is larger than 1 / deadtime."""
+    with pytest.raises(
+        ValueError,
+        match="The sum of the source and background count rates is larger than the inverse",
+    ):
+        non_paralyzable_dead_time_model(np.arange(10), 2.5e-3, rate=300, background_rate=300)
