@@ -385,8 +385,8 @@ def non_paralyzable_dead_time_model(
 
     if rate + background_rate > 1 / dead_time:
         raise ValueError(
-            "The sum of the source and background count rates is larger than the inverse of the dead time. "
-            "This is not a physical situation. Please check your input."
+            "The sum of the source and background count rates is larger than the inverse "
+            "of the dead time. This is not a physical situation. Please check your input."
         )
 
     if bin_time is None:
