@@ -94,7 +94,7 @@ def test_checkB(is_incident):
 @pytest.mark.parametrize("tb", [0.0001, 0.1])
 def test_A_and_B_array(tb):
     td = 2.5e-3
-    ks = np.array([1, 5, 20, 60])
+    ks = np.array([1, 5, 20, 70])
     rate = 10
     tau = 1 / rate
     r0 = r_det(td, rate)
