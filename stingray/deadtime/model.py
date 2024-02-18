@@ -377,8 +377,6 @@ def non_paralyzable_dead_time_model(
 
     Returns
     -------
-    freqs : array of floats
-        Frequency array
     power : array of floats
         Power spectrum
     """
@@ -402,6 +400,7 @@ def non_paralyzable_dead_time_model(
         limit_k=limit_k,
         rate_is_incident=False,
     )
+
     # Rescale by the source rate wrt background rate
     if background_rate > 0:
         zh_p = (zh_p - 2) * rate / (rate + background_rate) + 2
