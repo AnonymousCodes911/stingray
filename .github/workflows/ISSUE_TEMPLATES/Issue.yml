@@ -15,4 +15,4 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Your suggestions for the Fix
+      label: Your suggestions for the Fixes
