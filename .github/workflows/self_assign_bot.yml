@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if comment is on PR
+      - name: Check if comment is on PR or Issue
         run: |
           # Check if the event is a PR
           if [[ "${{ github.event.issue.pull_request }}" != "" ]]; then
