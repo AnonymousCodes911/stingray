@@ -1,18 +1,17 @@
-import warnings
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy import signal
-import matplotlib.pyplot as plt
-from stingray.utils import ifft, fftfreq
 
-from stingray.lightcurve import Lightcurve
-from stingray.crossspectrum import Crossspectrum, AveragedCrossspectrum
-from stingray.exceptions import StingrayError
 import stingray.utils as utils
+from stingray.crossspectrum import AveragedCrossspectrum, Crossspectrum
+from stingray.exceptions import StingrayError
+from stingray.lightcurve import Lightcurve
+from stingray.utils import fftfreq, ifft
 
 __all__ = ["CrossCorrelation", "AutoCorrelation"]
 
 
-class CrossCorrelation(object):
+class CrossCorrelation:
     r"""Make a cross-correlation from light curves or a cross spectrum.
 
     You can also make an empty :class:`Crosscorrelation` object to populate

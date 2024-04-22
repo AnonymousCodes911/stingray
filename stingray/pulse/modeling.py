@@ -1,6 +1,5 @@
 import numpy as np
-from astropy.modeling import models, fitting
-
+from astropy.modeling import fitting, models
 
 __all__ = ["sinc_square_model", "sinc_square_deriv", "fit_sinc", "fit_gaussian", "SincSquareModel"]
 

@@ -6,36 +6,33 @@ or to save existing light curves in a class that's easy to use.
 """
 
 import os
-import logging
 import warnings
 from collections.abc import Iterable
 
 import numpy as np
-from astropy.table import Table
-from astropy.time import TimeDelta, Time
 from astropy import units as u
+from astropy.table import Table
+from astropy.time import Time, TimeDelta
 
-from stingray.base import StingrayTimeseries, reduce_precision_if_extended
 import stingray.utils as utils
-from stingray.exceptions import StingrayError
-from stingray.gti import (
-    check_gtis,
-    create_gti_mask,
-    cross_two_gtis,
-    join_gtis,
+from stingray import bexvar
+from stingray.base import (
+    StingrayTimeseries,
+    interpret_times,
+    reduce_precision_if_extended,
 )
+from stingray.exceptions import StingrayError
+from stingray.gti import check_gtis, create_gti_mask, cross_two_gtis, join_gtis
+from stingray.io import lcurve_from_fits
+from stingray.loggingconfig import setup_logger
 from stingray.utils import (
     assign_value_if_none,
     baseline_als,
+    check_isallfinite,
+    is_sorted,
     poisson_symmetrical_errors,
     simon,
-    is_sorted,
-    check_isallfinite,
 )
-from stingray.io import lcurve_from_fits
-from stingray import bexvar
-from stingray.base import interpret_times
-from stingray.loggingconfig import setup_logger
 
 __all__ = ["Lightcurve"]
 
@@ -279,7 +276,7 @@ class Lightcurve(StingrayTimeseries):
             # err_dist set can be increased with other statistics
             raise StingrayError(
                 "Statistic not recognized." "Please select one of these: ",
-                "{}".format(valid_statistics),
+                f"{valid_statistics}",
             )
         elif not err_dist.lower() == "poisson":
             simon(
@@ -592,7 +589,7 @@ class Lightcurve(StingrayTimeseries):
         # ValueError is raised by Numpy while asserting np.equal over arrays
         # with different dimensions.
         try:
-            diff = np.abs((self.time[mask_self] - other.time[mask_other]))
+            diff = np.abs(self.time[mask_self] - other.time[mask_other])
             assert np.all(diff < self.dt / 100)
         except (ValueError, AssertionError):
             raise ValueError(

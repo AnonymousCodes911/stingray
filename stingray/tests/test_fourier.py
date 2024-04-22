@@ -1,27 +1,39 @@
 import os
-
 from collections.abc import Iterable
-import pytest
+
 import numpy as np
+import pytest
+from astropy.modeling.models import Lorentz1D
 from astropy.table import Table
 
-from stingray.fourier import fft, fftfreq, normalize_abs, normalize_frac, poisson_level
 from stingray.fourier import (
-    get_flux_iterable_from_segments,
-    avg_pds_from_timeseries,
+    avg_cs_from_events,
     avg_cs_from_timeseries,
     avg_pds_from_events,
-    avg_cs_from_events,
+    avg_pds_from_timeseries,
+    bias_term,
+    error_on_averaged_cross_spectrum,
+    estimate_intrinsic_coherence,
+    fft,
+    fftfreq,
+    get_average_ctrate,
+    get_flux_iterable_from_segments,
+    get_rms_from_rms_norm_periodogram,
+    get_rms_from_unnorm_periodogram,
+    impose_symmetry_lsft,
+    integrate_power_in_frequency_range,
+    lsft_fast,
+    lsft_slow,
+    normalize_abs,
+    normalize_frac,
+    normalize_leahy_from_variance,
+    normalize_periodograms,
+    poisson_level,
+    raw_coherence,
+    rms_calculation,
+    unnormalize_periodograms,
 )
-from stingray.fourier import normalize_periodograms, raw_coherence, estimate_intrinsic_coherence
-from stingray.fourier import bias_term, error_on_averaged_cross_spectrum, unnormalize_periodograms
-from stingray.fourier import impose_symmetry_lsft, lsft_slow, lsft_fast, rms_calculation
-from stingray.fourier import get_average_ctrate, normalize_leahy_from_variance
-from stingray.fourier import integrate_power_in_frequency_range
-from stingray.fourier import get_rms_from_rms_norm_periodogram, get_rms_from_unnorm_periodogram
-
 from stingray.utils import check_allclose_and_print
-from astropy.modeling.models import Lorentz1D
 
 curdir = os.path.abspath(os.path.dirname(__file__))
 datadir = os.path.join(curdir, "data")
@@ -139,7 +151,7 @@ def test_avg_cs_from_events_warns():
     assert res.meta["dt"] == 1
 
 
-class TestCoherence(object):
+class TestCoherence:
     @classmethod
     def setup_class(cls):
         data = (
@@ -215,7 +227,7 @@ class TestCoherence(object):
         assert np.isclose(coh_sngl, (C * np.conj(C)).real[0] / (P1[0] * P2[0]))
 
 
-class TestFourier(object):
+class TestFourier:
     @classmethod
     def setup_class(cls):
         cls.dt = 1
@@ -479,7 +491,7 @@ class TestFourier(object):
             compare_tables(out_ev, out_ct, rtol=0.1, discard=discard)
 
 
-class TestNorms(object):
+class TestNorms:
     @classmethod
     def setup_class(cls):
         cls.mean = cls.var = 100000.0
@@ -724,7 +736,7 @@ def test_impose_symmetry_lsft():
     assert np.all(freqs_new_slow == freqs_new_fast)
 
 
-class TestIntegration(object):
+class TestIntegration:
     @classmethod
     def setup_class(cls):
         cls.freq = [0, 1, 2, 3]
@@ -768,7 +780,7 @@ class TestIntegration(object):
         assert np.allclose(powe, np.sqrt(2))
 
 
-class TestRMS(object):
+class TestRMS:
     @classmethod
     def setup_class(cls):
         fwhm = 0.23456

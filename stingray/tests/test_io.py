@@ -1,17 +1,18 @@
-import numpy as np
 import os
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 import pytest
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ..io import split_numbers
-from ..io import ref_mjd
-from ..io import high_precision_keyword_read
-from ..io import load_events_and_gtis, read_mission_info
-from ..io import read_header_key
-
-import warnings
+from ..io import (
+    high_precision_keyword_read,
+    load_events_and_gtis,
+    read_header_key,
+    read_mission_info,
+    ref_mjd,
+    split_numbers,
+)
 
 curdir = os.path.abspath(os.path.dirname(__file__))
 datadir = os.path.join(curdir, "data")
@@ -26,7 +27,7 @@ except ImportError:
 skip_condition = pytest.mark.skipif(not _H5PY_INSTALLED, reason="H5PY not installed.")
 
 
-class TestIO(object):
+class TestIO:
     def test_common_name(self):
         """Test the common_name function."""
         from ..io import common_name
@@ -152,7 +153,7 @@ class TestIO(object):
         assert (n == r_n).all()
 
 
-class TmpIOReadWrite(object):
+class TmpIOReadWrite:
     """A temporary helper class to test all the read and write functions."""
 
     def __init__(self):
@@ -167,7 +168,7 @@ class TmpIOReadWrite(object):
         return self.number * 10
 
 
-class TestFileFormats(object):
+class TestFileFormats:
     def test_savefig_without_plot(self):
         from ..io import savefig
 
@@ -184,7 +185,7 @@ class TestFileFormats(object):
         os.unlink("test.png")
 
 
-class TestCalibrate(object):
+class TestCalibrate:
     @classmethod
     def setup_class(cls):
         curdir = os.path.abspath(os.path.dirname(__file__))

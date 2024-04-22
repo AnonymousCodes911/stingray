@@ -1,20 +1,33 @@
-import numpy as np
-import pytest
 import os
 
-from stingray.gti import cross_gtis, append_gtis, load_gtis, get_btis, join_gtis
-from stingray.gti import check_separate, create_gti_mask, check_gtis, merge_gtis
-from stingray.gti import create_gti_from_condition, gti_len, gti_border_bins
-from stingray.gti import time_intervals_from_gtis, bin_intervals_from_gtis
-from stingray.gti import create_gti_mask_complete, join_equal_gti_boundaries
+import numpy as np
+import pytest
+
 from stingray import StingrayError
+from stingray.gti import (
+    append_gtis,
+    bin_intervals_from_gtis,
+    check_gtis,
+    check_separate,
+    create_gti_from_condition,
+    create_gti_mask,
+    create_gti_mask_complete,
+    cross_gtis,
+    get_btis,
+    gti_border_bins,
+    gti_len,
+    join_equal_gti_boundaries,
+    join_gtis,
+    load_gtis,
+    merge_gtis,
+    time_intervals_from_gtis,
+)
 
 curdir = os.path.abspath(os.path.dirname(__file__))
 datadir = os.path.join(curdir, "data")
 
 
-class TestGTI(object):
-
+class TestGTI:
     """Real unit tests."""
 
     def test_crossgti1(self):
@@ -368,7 +381,7 @@ class TestGTI(object):
 _ALL_METHODS = ["intersection", "union", "infer", "append"]
 
 
-class TestMergeGTIs(object):
+class TestMergeGTIs:
     @classmethod
     def setup_class(cls):
         cls.gti1 = np.array([[1, 2], [3, 4], [5, 6]])

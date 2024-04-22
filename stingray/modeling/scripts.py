@@ -1,9 +1,13 @@
 import numpy as np
 from astropy.modeling import models
 
-from stingray.modeling import PSDParEst, PSDPosterior, PSDLogLikelihood
-from stingray.modeling import GaussianPosterior, GaussianLogLikelihood
-from stingray import Powerspectrum
+from stingray.modeling import (
+    GaussianLogLikelihood,
+    GaussianPosterior,
+    PSDLogLikelihood,
+    PSDParEst,
+    PSDPosterior,
+)
 
 __all__ = ["fit_powerspectrum", "fit_crossspectrum", "fit_lorentzians"]
 

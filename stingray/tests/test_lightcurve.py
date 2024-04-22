@@ -1,16 +1,17 @@
-import os
-import importlib
 import copy
+import importlib
+import os
+import warnings
+
+import astropy.units as u
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
-import warnings
-import matplotlib.pyplot as plt
-from numpy.testing import assert_allclose
-import astropy.units as u
+import scipy.stats
+from astropy.table import Table
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
-from astropy.table import Table
-import scipy.stats
+from numpy.testing import assert_allclose
 
 from stingray import Lightcurve
 from stingray.exceptions import StingrayError
@@ -49,7 +50,7 @@ def evar_fun(lc):
     return excess_variance(lc, normalization="none")
 
 
-class TestProperties(object):
+class TestProperties:
     @classmethod
     def setup_class(cls):
         dt = 0.1
@@ -270,7 +271,7 @@ class TestProperties(object):
             setattr(lc, attr, 3)
 
 
-class TestChunks(object):
+class TestChunks:
     @classmethod
     def setup_class(cls):
         dt = 0.1
@@ -350,7 +351,7 @@ class TestChunks(object):
         assert np.allclose(nevar_err * mean**2, evar_err, rtol=0.01)
 
 
-class TestLightcurve(object):
+class TestLightcurve:
     @classmethod
     def setup_class(cls):
         cls.times = np.array([1, 2, 3, 4])
@@ -1434,7 +1435,7 @@ class TestLightcurve(object):
         assert "Input timeseries must contain at least" in str(excinfo.value)
 
 
-class TestLightcurveRebin(object):
+class TestLightcurveRebin:
     @classmethod
     def setup_class(cls):
         dt = 0.0001220703125
@@ -1603,7 +1604,7 @@ class TestLightcurveRebin(object):
 
 
 @pytest.mark.slow
-class TestBexvar(object):
+class TestBexvar:
     @classmethod
     def setup_class(cls):
         fname_data = os.path.join(datadir, "LightCurve_bexvar.fits")
@@ -1672,7 +1673,7 @@ class TestBexvar(object):
         assert np.isclose(scatt_lo_function, scatt_lo_result, rtol=0.1)
 
 
-class TestArraydt(object):
+class TestArraydt:
     @classmethod
     def setup_class(cls):
         cls.times = np.array([1, 3, 4, 7])

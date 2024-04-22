@@ -1,12 +1,11 @@
-import numpy as np
 from collections.abc import Iterable
-from .pulsar import ef_profile_stat, pdm_profile_stat
-from .pulsar import fold_events, z_n, pulse_phase
-from ..utils import jit, HAS_NUMBA
-from ..utils import contiguous_regions
-from astropy.stats import poisson_conf_interval
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
+from astropy.stats import poisson_conf_interval
+
+from ..utils import HAS_NUMBA, contiguous_regions, jit
+from .pulsar import ef_profile_stat, fold_events, pdm_profile_stat, pulse_phase, z_n
 
 __all__ = [
     "epoch_folding_search",
@@ -490,7 +489,7 @@ def plot_phaseogram(phaseogram, phase_bins, time_bins, unit_str="s", ax=None, **
         ax = plt.subplot()
 
     ax.pcolormesh(phase_bins, time_bins, phaseogram.T, **plot_kwargs)
-    ax.set_ylabel("Time ({})".format(unit_str))
+    ax.set_ylabel(f"Time ({unit_str})")
     ax.set_xlabel("Phase")
     ax.set_xlim([0, np.max(phase_bins)])
     ax.set_ylim([np.min(time_bins), np.max(time_bins)])
@@ -510,7 +509,7 @@ def phaseogram(
     plot=False,
     phaseogram_ax=None,
     weights=None,
-    **plot_kwargs
+    **plot_kwargs,
 ):
     """
     Calculate and plot the phaseogram of a pulsar observation.

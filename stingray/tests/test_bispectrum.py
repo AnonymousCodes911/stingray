@@ -1,14 +1,9 @@
+import matplotlib.pyplot as plt
 import numpy as np
-
 import pytest
-import warnings
-import os
 
 from stingray import Lightcurve
 from stingray.bispectrum import Bispectrum
-from stingray.exceptions import StingrayError
-
-import matplotlib.pyplot as plt
 
 
 def allclose_with_wrap(array1, array2):
@@ -23,7 +18,7 @@ def allclose_with_wrap(array1, array2):
     return True
 
 
-class TestBispectrum(object):
+class TestBispectrum:
     @classmethod
     def setup_class(cls):
         cls.lc = Lightcurve([1, 2, 3, 4, 5], [2, 3, 2, 4, 1])

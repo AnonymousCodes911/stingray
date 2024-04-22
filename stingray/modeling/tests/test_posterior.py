@@ -1,29 +1,26 @@
-import numpy as np
-import scipy.stats
 import copy
 
+import numpy as np
 import pytest
+import scipy.stats
 from astropy.modeling import models
 from scipy.special import gammaln as scipy_gammaln
 
 from stingray import Lightcurve, Powerspectrum
 from stingray.modeling import (
-    Posterior,
-    PSDPosterior,
-    PoissonPosterior,
     GaussianPosterior,
     LaplacePosterior,
+    PoissonPosterior,
+    Posterior,
+    PSDPosterior,
+    set_logprior,
 )
-
-from stingray.modeling import set_logprior
-from stingray.modeling.posterior import logmin
-from stingray.modeling.posterior import IncorrectParameterError
-from stingray.modeling.posterior import LogLikelihood
+from stingray.modeling.posterior import IncorrectParameterError, LogLikelihood, logmin
 
 np.random.seed(20150907)
 
 
-class TestMeta(object):
+class TestMeta:
     def test_use_loglikelihood_class_directly(self):
         with pytest.raises(TypeError):
             a = LogLikelihood(1, 2, models.Lorentz1D)
@@ -47,7 +44,7 @@ class TestMeta(object):
         a(1, 2, models.Lorentz1D)
 
 
-class TestSetPrior(object):
+class TestSetPrior:
     @classmethod
     def setup_class(cls):
         photon_arrivals = np.sort(np.random.uniform(0, 1000, size=10000))
@@ -61,7 +58,7 @@ class TestSetPrior(object):
     def test_set_prior_runs(self):
         p_alpha = lambda alpha: ((-1.0 <= alpha) & (alpha <= 5.0)) / 6.0
         p_amplitude = (
-            lambda amplitude: ((-10 <= np.log(amplitude)) & ((np.log(amplitude) <= 10.0))) / 20.0
+            lambda amplitude: ((-10 <= np.log(amplitude)) & (np.log(amplitude) <= 10.0)) / 20.0
         )
 
         priors = {"alpha": p_alpha, "amplitude": p_amplitude}
@@ -70,7 +67,7 @@ class TestSetPrior(object):
     def test_prior_executes_correctly(self):
         p_alpha = lambda alpha: ((-1.0 <= alpha) & (alpha <= 5.0)) / 6.0
         p_amplitude = (
-            lambda amplitude: ((-10 <= np.log(amplitude)) & ((np.log(amplitude) <= 10.0))) / 20.0
+            lambda amplitude: ((-10 <= np.log(amplitude)) & (np.log(amplitude) <= 10.0)) / 20.0
         )
 
         priors = {"alpha": p_alpha, "amplitude": p_amplitude}
@@ -81,7 +78,7 @@ class TestSetPrior(object):
     def test_prior_returns_logmin_outside_prior_range(self):
         p_alpha = lambda alpha: ((-1.0 <= alpha) & (alpha <= 5.0)) / 6.0
         p_amplitude = (
-            lambda amplitude: ((-10 <= np.log(amplitude)) & ((np.log(amplitude) <= 10.0))) / 20.0
+            lambda amplitude: ((-10 <= np.log(amplitude)) & (np.log(amplitude) <= 10.0)) / 20.0
         )
 
         priors = {"alpha": p_alpha, "amplitude": p_amplitude}
@@ -107,7 +104,7 @@ class PosteriorClassDummy(Posterior):
         return lp
 
 
-class TestPosterior(object):
+class TestPosterior:
     @classmethod
     def setup_class(cls):
         cls.x = np.arange(100)
@@ -135,7 +132,7 @@ class TestPosterior(object):
         assert post == -(1.0 + np.log(1.0 / 6.0))
 
 
-class TestPSDPosterior(object):
+class TestPSDPosterior:
     @classmethod
     def setup_class(cls):
         m = 1
@@ -252,7 +249,7 @@ class TestPSDPosterior(object):
         assert np.isclose(post_test, post, atol=1.0e-10)
 
 
-class TestPoissonPosterior(object):
+class TestPoissonPosterior:
     @classmethod
     def setup_class(cls):
         nx = 1000000
@@ -373,7 +370,7 @@ class TestPoissonPosterior(object):
         assert np.isclose(lpost(t0), logmin, 1e-5)
 
 
-class TestGaussianPosterior(object):
+class TestGaussianPosterior:
     @classmethod
     def setup_class(cls):
         nx = 1000000
@@ -511,7 +508,7 @@ class TestGaussianPosterior(object):
         assert np.isclose(lpost(t0), logmin, 1e-5)
 
 
-class TestLaplacePosterior(object):
+class TestLaplacePosterior:
     @classmethod
     def setup_class(cls):
         nx = 1000000
@@ -635,7 +632,7 @@ class TestLaplacePosterior(object):
         assert np.isclose(lpost(t0), logmin, 1e-5)
 
 
-class TestPerPosteriorAveragedPeriodogram(object):
+class TestPerPosteriorAveragedPeriodogram:
     @classmethod
     def setup_class(cls):
         cls.m = 10

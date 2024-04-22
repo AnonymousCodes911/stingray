@@ -8,8 +8,8 @@ from .._astropy_init import *
 # ----------------------------------------------------------------------------
 
 try:
-    import pint.toa as toa
     import pint
+    import pint.toa as toa
     from pint.models import get_model
 
     HAS_PINT = True
@@ -20,6 +20,6 @@ except ImportError:
 
 # For egg_info test builds to pass, put package imports here.
 if not _ASTROPY_SETUP_:
+    from stingray.pulse.modeling import *
     from stingray.pulse.pulsar import *
     from stingray.pulse.search import *
-    from stingray.pulse.modeling import *

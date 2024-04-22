@@ -1,10 +1,11 @@
 import os
+
 import pytest
 
 from stingray.simulator import transfer
 
 
-class TestSimulator(object):
+class TestSimulator:
     @classmethod
     def setup_class(self):
         arr = [[1 for j in range(5)] for i in range(10)]

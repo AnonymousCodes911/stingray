@@ -50,13 +50,11 @@ assert np.allclose(expected, actual)
 ```
 """
 
+from itertools import product
+from typing import Iterable, List, Tuple
+
 import numpy as np
 from numpy import flip
-
-from itertools import product
-from typing import List, Iterable, Tuple
-
-from typing import List
 
 
 def nextpow(a: float, x: float) -> float:

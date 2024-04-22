@@ -11,9 +11,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 
 import warnings
+
 import numpy as np
-import scipy.stats
 import scipy.optimize
+import scipy.stats
 
 # check whether ultranest is installed for sampling
 try:

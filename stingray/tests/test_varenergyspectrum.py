@@ -1,16 +1,22 @@
-from multiprocessing import Event
 import os
-import numpy as np
-from stingray.events import EventList
-from stingray.varenergyspectrum import VarEnergySpectrum
-from stingray.varenergyspectrum import ComplexCovarianceSpectrum, CovarianceSpectrum
-from stingray.varenergyspectrum import RmsSpectrum, RmsEnergySpectrum, CountSpectrum
-from stingray.varenergyspectrum import LagSpectrum, LagEnergySpectrum
-from stingray.varenergyspectrum import ExcessVarianceSpectrum
-from stingray.lightcurve import Lightcurve
 
+import numpy as np
 import pytest
 from astropy.table import Table
+
+from stingray.events import EventList
+from stingray.lightcurve import Lightcurve
+from stingray.varenergyspectrum import (
+    ComplexCovarianceSpectrum,
+    CountSpectrum,
+    CovarianceSpectrum,
+    ExcessVarianceSpectrum,
+    LagEnergySpectrum,
+    LagSpectrum,
+    RmsEnergySpectrum,
+    RmsSpectrum,
+    VarEnergySpectrum,
+)
 
 _HAS_XARRAY = _HAS_PANDAS = _HAS_H5PY = True
 
@@ -41,7 +47,7 @@ class DummyVarEnergy(VarEnergySpectrum):
         return None, None
 
 
-class TestExcVarEnergySpectrum(object):
+class TestExcVarEnergySpectrum:
     @classmethod
     def setup_class(cls):
         from ..simulator import Simulator
@@ -69,7 +75,7 @@ class TestExcVarEnergySpectrum(object):
             )
 
 
-class TestVarEnergySpectrum(object):
+class TestVarEnergySpectrum:
     @classmethod
     def setup_class(cls):
         tstart = 0.0
@@ -152,7 +158,7 @@ class TestVarEnergySpectrum(object):
         np.testing.assert_allclose(ref_lc.counts, [0, 0, 0, 0, 1, 1])
 
 
-class TestCountSpectrum(object):
+class TestCountSpectrum:
     @classmethod
     def setup_class(cls):
         cls.times = [0.1, 2, 4, 5.5]
@@ -167,10 +173,9 @@ class TestCountSpectrum(object):
 
 
 @pytest.mark.slow
-class TestRmsAndCovSpectrum(object):
+class TestRmsAndCovSpectrum:
     @classmethod
     def setup_class(cls):
-        from ..simulator import Simulator
 
         cls.bin_time = 0.01
 
@@ -354,10 +359,9 @@ class TestRmsAndCovSpectrum(object):
 
 
 @pytest.mark.slow
-class TestLagEnergySpectrum(object):
+class TestLagEnergySpectrum:
     @classmethod
     def setup_class(cls):
-        from ..simulator import Simulator
 
         dt = 0.01
         cls.time_lag = 5.0

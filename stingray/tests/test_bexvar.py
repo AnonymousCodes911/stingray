@@ -1,12 +1,13 @@
-import warnings
-import pytest
 import os
-import numpy as np
-import scipy.stats
-from stingray import bexvar
-from astropy.table import Table
-from astropy.io import fits
 import signal
+
+import numpy as np
+import pytest
+import scipy.stats
+from astropy.io import fits
+from astropy.table import Table
+
+from stingray import bexvar
 
 pytestmark = pytest.mark.slow
 
@@ -30,7 +31,7 @@ curdir = os.path.abspath(os.path.dirname(__file__))
 datadir = os.path.join(curdir, "data")
 
 
-class TestBexvarResult(object):
+class TestBexvarResult:
     @classmethod
     def setup_class(cls):
         fname_data = os.path.join(datadir, "LightCurve_bexvar.fits")
@@ -122,7 +123,7 @@ class TestBexvarResult(object):
         assert np.isclose(scatt_lo, 0.0100, rtol=0.1)
 
 
-class TestInternalFunctions(object):
+class TestInternalFunctions:
     @classmethod
     def setup_class(cls):
         fname_data = os.path.join(datadir, "LightCurve_bexvar.fits")
@@ -192,7 +193,7 @@ class TestInternalFunctions(object):
         assert "ultranest not installed! Can't sample!" in str(excinfo.value)
 
 
-class TestBadValues(object):
+class TestBadValues:
     @classmethod
     def setup_class(cls):
         fname_data = os.path.join(datadir, "lcurveA.fits")

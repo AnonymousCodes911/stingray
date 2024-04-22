@@ -1,6 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import functools
+
+import matplotlib.pyplot as plt
+import numpy as np
+
 from stingray import Lightcurve
 
 try:
@@ -21,7 +23,7 @@ except ImportError:
     can_make_gp = False
 
 try:
-    from jaxns import ExactNestedSampler, TerminationCondition, Prior, Model
+    from jaxns import ExactNestedSampler, Model, Prior, TerminationCondition
     from jaxns.utils import resample
 
     can_sample = True

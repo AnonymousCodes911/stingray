@@ -1,7 +1,7 @@
 from ..sampledata import sample_data
 
 
-class TestSampleData(object):
+class TestSampleData:
     """Unit Tests for sampledata.py"""
 
     FIRST_LINE = [1.109110400703125000e08, 4.120000061392784119e03]

@@ -1,19 +1,16 @@
-import numpy as np
-
-import pytest
-import warnings
 import os
 
-from stingray import Lightcurve
-from stingray import Crossspectrum
-from stingray.crosscorrelation import CrossCorrelation, AutoCorrelation
-from stingray.exceptions import StingrayError
-from stingray.utils import ifft, fftfreq
-
 import matplotlib.pyplot as plt
+import numpy as np
+import pytest
+
+from stingray import Crossspectrum, Lightcurve
+from stingray.crosscorrelation import AutoCorrelation, CrossCorrelation
+from stingray.exceptions import StingrayError
+from stingray.utils import fftfreq, ifft
 
 
-class TestCrossCorrelationBase(object):
+class TestCrossCorrelationBase:
     @classmethod
     def setup_class(cls):
         dt = 0.01
@@ -38,7 +35,7 @@ class TestCrossCorrelationBase(object):
         assert np.isclose(np.min(cr.corr), -1, atol=0.01)
 
 
-class TestCrossCorrelation(object):
+class TestCrossCorrelation:
     @classmethod
     def setup_class(cls):
         cls.lc1 = Lightcurve([1, 2, 3, 4, 5], [2, 3, 2, 4, 1])

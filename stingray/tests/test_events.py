@@ -1,8 +1,9 @@
-import importlib
 import copy
+import importlib
 import os
-import pytest
+
 import numpy as np
+import pytest
 from astropy.time import Time
 
 from ..events import EventList
@@ -17,7 +18,7 @@ _HAS_H5PY = importlib.util.find_spec("h5py") is not None
 _HAS_YAML = importlib.util.find_spec("yaml") is not None
 
 
-class TestEvents(object):
+class TestEvents:
     @classmethod
     def setup_class(self):
         np.random.seed(57239875)
@@ -544,7 +545,7 @@ class TestJoinEvents:
         assert ev_new.mission == (1, 2, 3)
 
 
-class TestFilters(object):
+class TestFilters:
     @classmethod
     def setup_class(cls):
         events = np.array([1, 1.05, 1.07, 1.08, 1.1, 2, 2.2, 3, 3.1, 3.2])
@@ -608,7 +609,7 @@ class TestFilters(object):
         assert np.allclose(filt_events.energy, 1)
 
 
-class TestColors(object):
+class TestColors:
     @classmethod
     def setup_class(cls):
         cls.events = EventList(

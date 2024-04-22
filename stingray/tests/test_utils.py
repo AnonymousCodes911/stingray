@@ -1,13 +1,13 @@
-import pytest
 import numpy as np
-import stingray.utils as utils
-from stingray.utils import HAS_NUMBA
+import pytest
 from scipy.stats import sem
+
+import stingray.utils as utils
 
 np.random.seed(20150907)
 
 
-class TestRebinData(object):
+class TestRebinData:
     @classmethod
     def setup_class(cls):
         cls.dx = 1.0
@@ -89,7 +89,7 @@ class TestRebinData(object):
         assert np.allclose(ybin, counts)
 
 
-class TestRebinDataLog(object):
+class TestRebinDataLog:
     @classmethod
     def setup_class(cls):
         cls.dx = 1
@@ -194,7 +194,7 @@ class TestRebinDataLog(object):
         assert not np.iscomplexobj(binyerr)
 
 
-class TestUtils(object):
+class TestUtils:
     def test_optimal_bin_time(self):
         assert utils.optimal_bin_time(512, 2.1) == 2
         assert utils.optimal_bin_time(512, 3.9) == 2
@@ -262,7 +262,7 @@ class TestUtils(object):
             )
 
 
-class TestCreateWindow(object):
+class TestCreateWindow:
     @classmethod
     def setup_class(cls):
         cls.N = 5

@@ -1,26 +1,23 @@
-import math
 import copy
+import math
 import os
-import sys
-import traceback
 import warnings
 from collections.abc import Iterable
 
+import matplotlib.pyplot as plt
 import numpy as np
 from astropy.io import fits
-from astropy.table import Table
-from astropy.logger import AstropyUserWarning
-import matplotlib.pyplot as plt
 from astropy.io import fits as pf
+from astropy.logger import AstropyUserWarning
+from astropy.table import Table
 
 import stingray.utils as utils
 from stingray.loggingconfig import setup_logger
 
-from .utils import assign_value_if_none, is_string, order_list_of_arrays, is_sorted
 from .gti import get_gti_from_all_extensions, load_gtis
+from .utils import assign_value_if_none, is_sorted, is_string, order_list_of_arrays
 
 # Python 3
-import pickle
 
 _H5PY_INSTALLED = True
 
@@ -420,9 +417,10 @@ def lcurve_from_fits(
     # TODO:
     # treat consistently TDB, UTC, TAI, etc. This requires some documentation
     # reading. For now, we assume TDB
+    import numpy as np
     from astropy.io import fits as pf
     from astropy.time import Time
-    import numpy as np
+
     from stingray.gti import create_gti_from_condition
 
     lchdulist = pf.open(fits_file)
@@ -903,7 +901,7 @@ def common_name(str1, str2, default="common"):
     common_str = common_str.lstrip("_").lstrip("-")
     if common_str == "":
         common_str = default
-    logger.debug("common_name: %s %s -> %s" % (str1, str2, common_str))
+    logger.debug(f"common_name: {str1} {str2} -> {common_str}")
     return common_str
 
 

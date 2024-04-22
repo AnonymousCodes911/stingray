@@ -2,9 +2,9 @@ __all__ = ["OptimizationResults", "ParameterEstimation", "PSDParEst", "SamplingR
 
 
 import logging
+
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
-
 
 # check whether emcee is installed for sampling
 try:
@@ -21,14 +21,14 @@ try:
 except ImportError:
     use_corner = False
 
+import copy
 from multiprocessing import Pool
 
 import numpy as np
 import scipy
 import scipy.optimize
-import scipy.stats
 import scipy.signal
-import copy
+import scipy.stats
 
 try:
     from statsmodels.tools.numdiff import approx_hess
@@ -37,20 +37,20 @@ try:
 except ImportError:
     comp_hessian = False
 
-from stingray.modeling.posterior import (
-    Posterior,
-    PSDPosterior,
-    LogLikelihood,
-    PSDLogLikelihood,
-    logmin,
-    fitter_to_model_params,
-)
 from stingray.loggingconfig import CustomFormatter, setup_logger
+from stingray.modeling.posterior import (
+    LogLikelihood,
+    Posterior,
+    PSDLogLikelihood,
+    PSDPosterior,
+    fitter_to_model_params,
+    logmin,
+)
 
 logger = setup_logger()
 
 
-class OptimizationResults(object):
+class OptimizationResults:
     """
     Helper class that will contain the results of the regression.
     Less fiddly than a dictionary.
@@ -285,20 +285,20 @@ class OptimizationResults(object):
 
         all_parnames = [n for n in lpost.model.param_names]
         for i, par in enumerate(all_parnames):
-            self.log.info("{:3}) Parameter {:<20}: ".format(i, par))
+            self.log.info(f"{i:3}) Parameter {par:<20}: ")
 
             if par in parnames:
                 idx = parnames.index(par)
 
                 err_info = " (no error estimate)"
                 if self.err is not None:
-                    err_info = " +/- {:<20.5f}".format(self.err[idx])
-                self.log.info("{:<20.5f}{} ".format(self.p_opt[idx], err_info))
-                self.log.info("[{:>10} {:>10}]".format(str(bounds[i][0]), str(bounds[i][1])))
+                    err_info = f" +/- {self.err[idx]:<20.5f}"
+                self.log.info(f"{self.p_opt[idx]:<20.5f}{err_info} ")
+                self.log.info(f"[{str(bounds[i][0]):>10} {str(bounds[i][1]):>10}]")
             elif fixed[i]:
-                self.log.info("{:<20.5f} (Fixed) ".format(lpost.model.parameters[i]))
+                self.log.info(f"{lpost.model.parameters[i]:<20.5f} (Fixed) ")
             elif tied[i]:
-                self.log.info("{:<20.5f} (Tied) ".format(lpost.model.parameters[i]))
+                self.log.info(f"{lpost.model.parameters[i]:<20.5f} (Tied) ")
 
         self.log.info("\n")
 
@@ -331,12 +331,12 @@ class OptimizationResults(object):
         )
 
         self.log.info(" -- Summed Residuals S = %f.5f" % self.sobs)
-        self.log.info(" -- Expected S ~ %f.5 +/- %f.5" % (self.sexp, self.ssd))
+        self.log.info(f" -- Expected S ~ {self.sexp:f}.5 +/- {self.ssd:f}.5")
 
         return
 
 
-class ParameterEstimation(object):
+class ParameterEstimation:
     """
     Parameter estimation of two-dimensional data, either via
     optimization or MCMC.
@@ -452,7 +452,7 @@ class ParameterEstimation(object):
                         args=args,
                         tol=1.0e-10,
                         bounds=bounds,
-                        **scipy_optimize_options
+                        **scipy_optimize_options,
                     )
 
                 else:
@@ -462,7 +462,7 @@ class ParameterEstimation(object):
                         method=self.fitmethod,
                         args=args,
                         tol=1.0e-10,
-                        **scipy_optimize_options
+                        **scipy_optimize_options,
                     )
 
             # if max_post is False, then do a Maximum Likelihood Fit
@@ -477,7 +477,7 @@ class ParameterEstimation(object):
                             args=args,
                             tol=1.0e-10,
                             bounds=bounds,
-                            **scipy_optimize_options
+                            **scipy_optimize_options,
                         )
                     else:
                         opt = scipy.optimize.minimize(
@@ -486,7 +486,7 @@ class ParameterEstimation(object):
                             method=self.fitmethod,
                             args=args,
                             tol=1.0e-10,
-                            **scipy_optimize_options
+                            **scipy_optimize_options,
                         )
 
                 elif isinstance(lpost, LogLikelihood):
@@ -501,7 +501,7 @@ class ParameterEstimation(object):
                             args=args,
                             tol=1.0e-10,
                             # bounds=bounds,
-                            **scipy_optimize_options
+                            **scipy_optimize_options,
                         )
 
                     else:
@@ -511,7 +511,7 @@ class ParameterEstimation(object):
                             method=self.fitmethod,
                             args=args,
                             tol=1.0e-10,
-                            **scipy_optimize_options
+                            **scipy_optimize_options,
                         )
 
             funcval = opt.fun
@@ -912,7 +912,7 @@ class ParameterEstimation(object):
         return pval
 
 
-class SamplingResults(object):
+class SamplingResults:
     """
     Helper class that will contain the results of the sampling
     in a handy format.
@@ -1102,7 +1102,7 @@ class SamplingResults(object):
 
         self.log.info("-- The acceptance fraction is: %f.5" % self.acceptance)
         try:
-            self.log.info("-- The autocorrelation time is: {}".format(self.acor))
+            self.log.info(f"-- The autocorrelation time is: {self.acor}")
         except AttributeError:
             pass
 

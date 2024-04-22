@@ -1,17 +1,18 @@
-import pytest
 import numpy as np
+import pytest
+
 from stingray.power_colors import (
-    power_color,
+    DEFAULT_COLOR_CONFIGURATION,
     hue_from_power_color,
     plot_hues,
     plot_power_colors,
-    DEFAULT_COLOR_CONFIGURATION,
+    power_color,
 )
 
 rng = np.random.RandomState(1259723)
 
 
-class TestPowerColor(object):
+class TestPowerColor:
     @classmethod
     def setup_class(cls):
         cls.freq = np.arange(0.0001, 17, 0.00001)

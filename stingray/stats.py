@@ -3,9 +3,8 @@ from collections.abc import Iterable
 
 import numpy as np
 from scipy import stats
-from stingray.utils import simon
-from stingray.utils import vectorize, float64, float32, int32, int64
 
+from stingray.utils import float32, float64, int32, int64, simon, vectorize
 
 __all__ = [
     "p_multitrial_from_single_trial",

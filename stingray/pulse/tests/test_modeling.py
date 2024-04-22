@@ -1,6 +1,8 @@
-import numpy as np
 import warnings
-from stingray.pulse.modeling import fit_sinc, fit_gaussian, SincSquareModel
+
+import numpy as np
+
+from stingray.pulse.modeling import SincSquareModel, fit_gaussian, fit_sinc
 
 np.random.seed(0)
 

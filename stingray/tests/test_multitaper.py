@@ -1,20 +1,14 @@
 import numpy as np
-import copy
-import warnings
-
 import pytest
-from numpy.random import poisson, standard_cauchy
-from scipy.signal import TransferFunction
 
-from stingray import Lightcurve
+from stingray import Lightcurve, Multitaper, Powerspectrum
 from stingray.events import EventList
-from stingray import Multitaper, Powerspectrum
 
 pytestmark = pytest.mark.slow
 np.random.seed(1)
 
 
-class TestMultitaper(object):
+class TestMultitaper:
     @classmethod
     def setup_class(cls):
         tstart = 0.0

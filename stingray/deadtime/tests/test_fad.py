@@ -1,17 +1,21 @@
 import os
+
 import numpy as np
 import pytest
+from astropy.table import Table
+
+from stingray import EventList, Lightcurve
+from stingray.crossspectrum import AveragedCrossspectrum
+from stingray.deadtime.fad import (
+    FAD,
+    calculate_FAD_correction,
+    get_periodograms_from_FAD_results,
+)
+from stingray.filters import filter_for_deadtime
+from stingray.powerspectrum import AveragedPowerspectrum
 
 # import warnings
-import warnings
 
-from astropy.table import Table
-from stingray import Lightcurve, EventList
-from stingray.deadtime.fad import calculate_FAD_correction, FAD
-from stingray.deadtime.fad import get_periodograms_from_FAD_results
-from stingray.filters import filter_for_deadtime
-from stingray.crossspectrum import AveragedCrossspectrum
-from stingray.powerspectrum import AveragedPowerspectrum
 
 try:
     import h5py

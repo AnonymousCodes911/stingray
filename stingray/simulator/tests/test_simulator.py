@@ -1,13 +1,13 @@
-import numpy as np
 import os
 import warnings
 
-from scipy.interpolate import interp1d
-import pytest
 import astropy.modeling.models
-from stingray import Lightcurve, Crossspectrum, sampledata, Powerspectrum
-from stingray.simulator import Simulator
-from stingray.simulator import models
+import numpy as np
+import pytest
+from scipy.interpolate import interp1d
+
+from stingray import Crossspectrum, Lightcurve, Powerspectrum, sampledata
+from stingray.simulator import Simulator, models
 
 _H5PY_INSTALLED = True
 
@@ -17,7 +17,7 @@ except ImportError:
     _H5PY_INSTALLED = False
 
 
-class TestSimulator(object):
+class TestSimulator:
     @classmethod
     def setup_class(self):
         self.N = 1024

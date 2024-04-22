@@ -1,19 +1,15 @@
 import numpy as np
-import warnings
-import copy
-
-import numpy as np
 import numpy.random as ra
 
-from .utils import njit
 from .loggingconfig import setup_logger
+from .utils import njit
 
 __all__ = ["Window1D", "Optimal1D"]
 
 logger = setup_logger()
 
 
-class Window1D(object):
+class Window1D:
     """
     Make a top hat filter (window function) for power spectrum or cross
     spectrum. It assumes that the first model is the QPO component
@@ -49,7 +45,7 @@ class Window1D(object):
         return y
 
 
-class Optimal1D(object):
+class Optimal1D:
     """
     Make a optimal filter for power spectrum or cross spectrum.
     It assumes that the first model is the QPO component.
@@ -154,7 +150,7 @@ def _non_paralyzable_dead_time(event_list, dead_time):
     return event_list[mask], mask
 
 
-class DeadtimeFilterOutput(object):
+class DeadtimeFilterOutput:
     uf_events = None
     is_event = None
     deadtime = None
@@ -262,7 +258,7 @@ def get_deadtime_mask(
     if verbose:
         logger.info(
             "filter_for_deadtime: "
-            "{0}/{1} events rejected".format(initial_len - final_len, initial_len)
+            "{}/{} events rejected".format(initial_len - final_len, initial_len)
         )
 
     retval = saved_mask[all_ev_kind]

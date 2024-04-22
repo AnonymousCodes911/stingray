@@ -1,12 +1,11 @@
 import abc
 import warnings
+from collections.abc import Iterable
 
 import numpy as np
-from collections.abc import Iterable
 
 np.seterr("warn")
 
-from scipy.special import gamma as scipy_gamma
 from scipy.special import gammaln as scipy_gammaln
 
 try:
@@ -14,11 +13,7 @@ try:
 except ImportError:
     from astropy.modeling.fitting import _fitter_to_model_params as fitter_to_model_params
 
-from astropy.modeling import models
-
-from stingray import Lightcurve, Powerspectrum
 from stingray.utils import assign_if_not_finite
-
 
 # TODO: Add checks and balances to code
 
@@ -171,7 +166,7 @@ def set_logprior(lpost, priors):
     return logprior
 
 
-class LogLikelihood(object, metaclass=abc.ABCMeta):
+class LogLikelihood(metaclass=abc.ABCMeta):
     """
 
     Abstract Base Class defining the structure of a :class:`LogLikelihood` object.
@@ -582,7 +577,7 @@ class LaplaceLogLikelihood(LogLikelihood):
             return loglike
 
 
-class Posterior(object):
+class Posterior:
     """
     Define a :class:`Posterior` object.
 
@@ -755,7 +750,7 @@ class PSDPosterior(Posterior):
         self.m = m
         Posterior.__init__(self, freq, power, model)
 
-        if not priors is None:
+        if priors is not None:
             self.logprior = set_logprior(self, priors)
 
 
@@ -807,7 +802,7 @@ class PoissonPosterior(Posterior):
 
         Posterior.__init__(self, self.x, self.y, model)
 
-        if not priors is None:
+        if priors is not None:
             self.logprior = set_logprior(self, priors)
 
 
@@ -850,7 +845,7 @@ class GaussianPosterior(Posterior):
 
         self.yerr = yerr
 
-        if not priors is None:
+        if priors is not None:
             self.logprior = set_logprior(self, priors)
 
 
@@ -893,5 +888,5 @@ class LaplacePosterior(Posterior):
 
         self.yerr = yerr
 
-        if not priors is None:
+        if priors is not None:
             self.logprior = set_logprior(self, priors)

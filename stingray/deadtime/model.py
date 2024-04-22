@@ -1,13 +1,13 @@
 import warnings
-from stingray.utils import njit, prange
+from collections.abc import Iterable
+
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.interpolate import interp1d
+from scipy.special import factorial
 
 from stingray.loggingconfig import setup_logger
-
-from collections.abc import Iterable
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.special import factorial
-from scipy.interpolate import interp1d
+from stingray.utils import njit, prange
 
 logger = setup_logger()
 

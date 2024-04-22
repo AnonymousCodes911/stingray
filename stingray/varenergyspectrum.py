@@ -1,20 +1,20 @@
+from abc import ABCMeta, abstractmethod
+
 import numpy as np
-import warnings
+
 from stingray.base import StingrayObject
-from stingray.gti import check_separate, cross_two_gtis
-
-from stingray.lightcurve import Lightcurve
-from stingray.utils import assign_value_if_none, simon, excess_variance, show_progress
-
 from stingray.fourier import (
     avg_cs_from_timeseries,
     avg_pds_from_timeseries,
+    cross_to_covariance,
+    error_on_averaged_cross_spectrum,
     fftfreq,
     get_average_ctrate,
+    poisson_level,
 )
-from stingray.fourier import poisson_level, error_on_averaged_cross_spectrum, cross_to_covariance
-from abc import ABCMeta, abstractmethod
-
+from stingray.gti import check_separate, cross_two_gtis
+from stingray.lightcurve import Lightcurve
+from stingray.utils import assign_value_if_none, excess_variance, show_progress, simon
 
 __all__ = [
     "VarEnergySpectrum",
@@ -548,7 +548,7 @@ class RmsSpectrum(VarEnergySpectrum):
                     continue
                 cross = results["power"]
 
-                m_ave, mean = [results.meta[key] for key in ["m", "mean"]]
+                m_ave, mean = (results.meta[key] for key in ["m", "mean"])
                 mean_power = np.mean(cross[good])
                 power_noise = 0
                 rmsnoise = np.sqrt(
@@ -561,7 +561,7 @@ class RmsSpectrum(VarEnergySpectrum):
                 if results is None:
                     continue
                 sub_power = results["power"]
-                m_ave, mean = [results.meta[key] for key in ["m", "mean"]]
+                m_ave, mean = (results.meta[key] for key in ["m", "mean"])
 
                 mean_power = np.mean(sub_power[good])
                 power_noise = sub_power_noise

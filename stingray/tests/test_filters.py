@@ -1,14 +1,13 @@
-import pytest
 import numpy as np
-
+import pytest
 from astropy.modeling import models
-
-from ..filters import Window1D, Optimal1D, filter_for_deadtime
 
 from stingray.events import EventList
 
+from ..filters import Optimal1D, Window1D, filter_for_deadtime
 
-class TestFilters(object):
+
+class TestFilters:
     @classmethod
     def setup_class(self):
         self.x = np.linspace(0, 10, 100)
@@ -44,7 +43,7 @@ def test_filter_for_deadtime_nonpar():
     events = np.array([1, 1.05, 1.07, 1.08, 1.1, 2, 2.2, 3, 3.1, 3.2])
     filt_events, info = filter_for_deadtime(events, 0.11, return_all=True)
     expected = np.array([1, 2, 2.2, 3, 3.2])
-    assert np.allclose(filt_events, expected), "Wrong: {} vs {}".format(filt_events, expected)
+    assert np.allclose(filt_events, expected), f"Wrong: {filt_events} vs {expected}"
     assert np.allclose(filt_events, info.uf_events[info.is_event])
 
 
@@ -58,7 +57,7 @@ def test_filter_for_deadtime_evlist():
     filt_events = filter_for_deadtime(events, 0.11)
 
     expected = np.array([1, 2, 2.2, 3, 3.2])
-    assert np.allclose(filt_events.time, expected), "Wrong: {} vs {}".format(filt_events, expected)
+    assert np.allclose(filt_events.time, expected), f"Wrong: {filt_events} vs {expected}"
 
     assert np.allclose(filt_events.pi, 1)
     assert np.allclose(filt_events.energy, 1)
@@ -85,7 +84,7 @@ def test_filter_for_deadtime_nonpar_sigma():
     events = np.array([1, 1.05, 1.07, 1.08, 1.1, 2, 2.2, 3, 3.1, 3.2])
     filt_events = filter_for_deadtime(events, 0.11, dt_sigma=0.001)
     expected = np.array([1, 2, 2.2, 3, 3.2])
-    assert np.allclose(filt_events, expected), "Wrong: {} vs {}".format(filt_events, expected)
+    assert np.allclose(filt_events, expected), f"Wrong: {filt_events} vs {expected}"
 
 
 def test_filter_for_deadtime_nonpar_bkg():
@@ -95,8 +94,8 @@ def test_filter_for_deadtime_nonpar_bkg():
     filt_events, info = filter_for_deadtime(events, 0.11, bkg_ev_list=bkg_events, return_all=True)
     expected_ev = np.array([2, 2.2, 3, 3.2])
     expected_bk = np.array([1])
-    assert np.allclose(filt_events, expected_ev), "Wrong: {} vs {}".format(filt_events, expected_ev)
-    assert np.allclose(info.bkg, expected_bk), "Wrong: {} vs {}".format(info.bkg, expected_bk)
+    assert np.allclose(filt_events, expected_ev), f"Wrong: {filt_events} vs {expected_ev}"
+    assert np.allclose(info.bkg, expected_bk), f"Wrong: {info.bkg} vs {expected_bk}"
     assert np.allclose(filt_events, info.uf_events[info.is_event])
 
 
@@ -115,6 +114,6 @@ def test_filter_for_deadtime_par_bkg():
     )
     expected_ev = np.array([2, 2.2, 3])
     expected_bk = np.array([1])
-    assert np.allclose(filt_events, expected_ev), "Wrong: {} vs {}".format(filt_events, expected_ev)
-    assert np.allclose(info.bkg, expected_bk), "Wrong: {} vs {}".format(info.bkg, expected_bk)
+    assert np.allclose(filt_events, expected_ev), f"Wrong: {filt_events} vs {expected_ev}"
+    assert np.allclose(info.bkg, expected_bk), f"Wrong: {info.bkg} vs {expected_bk}"
     assert np.allclose(filt_events, info.uf_events[info.is_event])

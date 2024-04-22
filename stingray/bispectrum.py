@@ -1,18 +1,15 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import toeplitz
-import warnings
-import matplotlib.pyplot as plt
 
-from scipy.linalg import hankel
-
-from stingray import lightcurve
 import stingray.utils as utils
-from stingray.utils import fftshift, fft2, ifftshift, fft
+from stingray import lightcurve
+from stingray.utils import fft2, fftshift, ifftshift
 
 __all__ = ["Bispectrum"]
 
 
-class Bispectrum(object):
+class Bispectrum:
     """Makes a :class:`Bispectrum` object from a :class:`stingray.Lightcurve`.
 
     :class:`Bispectrum` is a higher order time series analysis method and is calculated by
@@ -329,7 +326,7 @@ class Bispectrum(object):
             self.bispec = fftshift(fft2(ifftshift(self.cum3 * self.window)))
 
         self.bispec_mag = np.abs(self.bispec)
-        self.bispec_phase = np.angle((self.bispec))
+        self.bispec_phase = np.angle(self.bispec)
 
     def plot_cum3(self, axis=None, save=False, filename=None):
         """

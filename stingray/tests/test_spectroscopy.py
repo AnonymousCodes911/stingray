@@ -1,21 +1,19 @@
+from os import remove
+
 import numpy as np
 import pytest
-import stingray.spectroscopy as spec
-from stingray.filters import Window1D
-from stingray import (
-    Lightcurve,
-    AveragedPowerspectrum,
-    AveragedCrossspectrum,
-    Powerspectrum,
-    Crossspectrum,
-)
-from stingray.utils import fft
-from stingray.modeling import fit_lorentzians, fit_crossspectrum, fit_powerspectrum
-from stingray.filters import Optimal1D, Window1D
 from astropy.modeling import models
-from astropy.table import Table, Column
+from astropy.table import Column, Table
 
-from os import remove
+import stingray.spectroscopy as spec
+from stingray import (
+    AveragedCrossspectrum,
+    AveragedPowerspectrum,
+    Crossspectrum,
+    Lightcurve,
+    Powerspectrum,
+)
+from stingray.filters import Optimal1D, Window1D
 
 np.random.seed(123412525)
 
@@ -92,7 +90,7 @@ def fake_qpo(
 
 @pytest.mark.slow
 @pytest.mark.xfail
-class TestCCF(object):
+class TestCCF:
     @classmethod
     def setup_class(cls):
         total_length = 16000

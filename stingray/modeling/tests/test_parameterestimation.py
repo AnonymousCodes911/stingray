@@ -1,17 +1,25 @@
-import numpy as np
-import scipy.stats
+import logging
 import os
 import warnings
-import logging
 
+import numpy as np
 import pytest
+import scipy.stats
 from astropy.modeling import models
 
-from stingray import Powerspectrum, AveragedPowerspectrum
-from stingray.modeling import ParameterEstimation, PSDParEst, OptimizationResults, SamplingResults
-from stingray.modeling import PSDPosterior, set_logprior, PSDLogLikelihood, LogLikelihood
-from stingray.modeling.posterior import fitter_to_model_params
+from stingray import Powerspectrum
 from stingray.loggingconfig import CustomFormatter, setup_logger
+from stingray.modeling import (
+    LogLikelihood,
+    OptimizationResults,
+    ParameterEstimation,
+    PSDLogLikelihood,
+    PSDParEst,
+    PSDPosterior,
+    SamplingResults,
+    set_logprior,
+)
+from stingray.modeling.posterior import fitter_to_model_params
 
 try:
     from statsmodels.tools.numdiff import approx_hess
@@ -27,7 +35,6 @@ try:
 except ImportError:
     can_sample = False
 
-import matplotlib.pyplot as plt
 
 logger = setup_logger()
 
@@ -64,7 +71,7 @@ class OptimizationResultsSubclassDummy(OptimizationResults):
         self.model = lpost.model
 
 
-class TestParameterEstimation(object):
+class TestParameterEstimation:
     @classmethod
     def setup_class(cls):
         np.random.seed(100)
@@ -208,7 +215,7 @@ class TestParameterEstimation(object):
             pe.simulate_lrts(None, None, None, None, None)
 
 
-class TestOptimizationResults(object):
+class TestOptimizationResults:
     @classmethod
     def setup_class(cls):
         np.random.seed(1000)
@@ -410,7 +417,7 @@ if can_sample:
             self.acceptance = np.nanmean(sampler.acceptance_fraction)
             self.L = self.acceptance * self.samples.shape[0]
 
-    class TestSamplingResults(object):
+    class TestSamplingResults:
         @classmethod
         def setup_class(cls):
             m = 1
@@ -505,7 +512,7 @@ def logger():
     return logger
 
 
-class TestPSDParEst(object):
+class TestPSDParEst:
     @classmethod
     def setup_class(cls):
         m = 1
