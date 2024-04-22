@@ -1,6 +1,5 @@
 name: General Issue
 description: Your issue does not fit the categories already mentioned.
-title: " "
 labels: 
   - help wanted
 body:
