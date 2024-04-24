@@ -1,17 +1,18 @@
-import numbers
 import pickle
-import warnings
-
-import astropy.modeling.models
+from os import error
 import numpy as np
+import numbers
+import warnings
 from scipy import signal
-
-from stingray import AveragedPowerspectrum, Lightcurve, utils
+import astropy.modeling.models
+from stingray import utils
+from stingray import Lightcurve
+from stingray import AveragedPowerspectrum
 
 __all__ = ["Simulator"]
 
 
-class Simulator:
+class Simulator(object):
     """
     Methods to simulate and visualize light curves.
 

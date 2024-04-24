@@ -1,11 +1,13 @@
 import numpy as np
+
 import pytest
+import warnings
 
 from stingray import AveragedCovariancespectrum, Covariancespectrum, Lightcurve
 from stingray.events import EventList
 
 
-class TestCovariancespectrumwithEvents:
+class TestCovariancespectrumwithEvents(object):
     def setup_class(self):
         event_list = np.array(
             [
@@ -111,7 +113,7 @@ class TestCovariancespectrumwithEvents:
             c = Covariancespectrum(e, dt=1)
 
 
-class TestCovariancewithLightcurves:
+class TestCovariancewithLightcurves(object):
     def setup_class(self):
         time = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
         counts1 = np.array([0, 0, 1, 0, 1, 1, 0, 0, 0])
@@ -179,7 +181,7 @@ class TestCovariancewithLightcurves:
             c = Covariancespectrum(self.lcs, ref_band_interest=self.lcs[:-1])
 
 
-class TestAveragedCovariancespectrum:
+class TestAveragedCovariancespectrum(object):
     def setup_class(self):
         event_list = np.array(
             [

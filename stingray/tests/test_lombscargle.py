@@ -5,12 +5,10 @@ import pytest
 from scipy.interpolate import interp1d
 
 from stingray.events import EventList
+from stingray.exceptions import StingrayError
 from stingray.lightcurve import Lightcurve
-from stingray.lombscargle import (
-    LombScargleCrossspectrum,
-    LombScarglePowerspectrum,
-    _autofrequency,
-)
+from stingray.lombscargle import LombScargleCrossspectrum, LombScarglePowerspectrum
+from stingray.lombscargle import _autofrequency
 from stingray.simulator import Simulator
 
 

@@ -1,7 +1,6 @@
-import numpy as np
 import pytest
+import numpy as np
 from scipy import stats
-
 from stingray.stats import *
 
 
@@ -78,7 +77,7 @@ def test_zn_probability(ntrial):
     np.testing.assert_almost_equal(z2_n_probability(detlev, 2, ntrial=ntrial), 0.1)
 
 
-class TestClassicalSignificances:
+class TestClassicalSignificances(object):
     def test_function_runs(self):
         power = 2.0
         nspec = 1.0

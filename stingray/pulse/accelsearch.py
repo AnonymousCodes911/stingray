@@ -1,15 +1,14 @@
-import tempfile
-import warnings
 from collections.abc import Iterable
 from multiprocessing import Pool
+import warnings
+import tempfile
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+from scipy import special
 import scipy.signal
 from astropy.table import Table
-from scipy import special
-
+import matplotlib.pyplot as plt
 from stingray.loggingconfig import setup_logger
 
 logger = setup_logger()
@@ -24,9 +23,9 @@ except ImportError:
 
 from stingray.pulse.overlapandsave.ols import ols
 
+from ..utils import njit, fft, fftfreq, fftn, ifftn, HAS_PYFFTW
+from ..stats import pds_probability, pds_detection_level
 from ..gti import create_gti_mask
-from ..stats import pds_detection_level, pds_probability
-from ..utils import fft, fftfreq, fftn, ifftn, njit
 
 
 def convolve_ols(a, b, memout=None):
@@ -407,7 +406,7 @@ def accelsearch(
     start_z = -zmax
     end_z = zmax
     range_z = np.arange(start_z, end_z, delta_z)
-    logger.info(f"min and max r_dot: {delta_z / T**2}--{np.max(range_z) / T**2}")
+    logger.info("min and max r_dot: {}--{}".format(delta_z / T**2, np.max(range_z) / T**2))
     freqs_to_search = freq[freq_intv_to_search]
 
     candidate_table = Table(

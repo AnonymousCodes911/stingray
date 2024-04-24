@@ -1,22 +1,15 @@
 import os
-
-import numpy as np
 import pytest
+import numpy as np
 from scipy.interpolate import interp1d
 
-from stingray.deadtime.model import (
-    A,
-    B,
-    check_A,
-    check_B,
-    non_paralyzable_dead_time_model,
-    pds_model_zhang,
-    r_det,
-    r_in,
-)
-from stingray.filters import filter_for_deadtime
 from stingray.lightcurve import Lightcurve
 from stingray.powerspectrum import AveragedPowerspectrum
+from stingray.deadtime.model import r_det, r_in, pds_model_zhang, non_paralyzable_dead_time_model
+from stingray.deadtime.model import check_A, check_B, A, B
+from stingray.filters import filter_for_deadtime
+from stingray.utils import HAS_NUMBA
+
 
 pytestmark = pytest.mark.slow
 

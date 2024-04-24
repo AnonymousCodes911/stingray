@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-
 from stingray.pulse.accelsearch import accelsearch
+from stingray.utils import HAS_NUMBA
 
 pytestmark = pytest.mark.slow
 
@@ -19,7 +19,7 @@ def pulsar(phase, amplitude=1, pf=1):
     return mean + 0.5 * amplitude * pf * np.sin(TWOPI * phase)
 
 
-class TestAccelsearch:
+class TestAccelsearch(object):
     """Unit tests for the stingray.pulse.search module."""
 
     @classmethod

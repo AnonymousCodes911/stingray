@@ -2,49 +2,49 @@
 
 from __future__ import annotations
 
-import copy
+from collections.abc import Iterable
+from collections import OrderedDict
+
 import pickle
 import warnings
-from collections import OrderedDict
-from collections.abc import Iterable
-from typing import TYPE_CHECKING, TypeVar, Union
+import copy
 
 import numpy as np
 from astropy.table import Table
 from astropy.time import Time, TimeDelta
 from astropy.units import Quantity
-
 from stingray.loggingconfig import setup_logger
 
-from .gti import (
-    bin_intervals_from_gtis,
-    check_gtis,
-    create_gti_mask,
-    cross_two_gtis,
-    get_btis,
-    get_total_gti_length,
-    gti_border_bins,
-    join_gtis,
-    merge_gtis,
-    time_intervals_from_gtis,
-)
 from .io import _can_save_longdouble, _can_serialize_meta
 from .utils import (
-    assign_value_if_none,
-    find_nearest,
-    get_random_state,
-    make_1d_arrays_into_nd,
-    make_nd_into_arrays,
-    rebin_data,
     sqsum,
+    assign_value_if_none,
+    make_nd_into_arrays,
+    make_1d_arrays_into_nd,
+    get_random_state,
+    find_nearest,
+    rebin_data,
 )
+from .gti import (
+    create_gti_mask,
+    check_gtis,
+    cross_two_gtis,
+    join_gtis,
+    gti_border_bins,
+    get_btis,
+    merge_gtis,
+    get_total_gti_length,
+    bin_intervals_from_gtis,
+    time_intervals_from_gtis,
+)
+from typing import TYPE_CHECKING, Type, TypeVar, Union
 
 if TYPE_CHECKING:
-    import numpy.typing as npt
-    from astropy.time import TimeDelta
-    from astropy.timeseries import TimeSeries
-    from pandas import DataFrame
     from xarray import Dataset
+    from pandas import DataFrame
+    from astropy.timeseries import TimeSeries
+    from astropy.time import TimeDelta
+    import numpy.typing as npt
 
     TTime = Union[Time, TimeDelta, Quantity, npt.ArrayLike]
     Tso = TypeVar("Tso", bound="StingrayObject")
@@ -72,7 +72,7 @@ def convert_table_attrs_to_lowercase(table: Table) -> Table:
     return new_table
 
 
-class StingrayObject:
+class StingrayObject(object):
     """This base class defines some general-purpose utilities.
 
     The main purpose is to have a consistent mechanism for:
@@ -391,7 +391,7 @@ class StingrayObject:
         return ts
 
     @classmethod
-    def from_astropy_table(cls: type[Tso], ts: Table) -> Tso:
+    def from_astropy_table(cls: Type[Tso], ts: Table) -> Tso:
         """Create a Stingray Object object from data in an Astropy Table.
 
         The table MUST contain at least a column named like the
@@ -468,7 +468,7 @@ class StingrayObject:
         return ts
 
     @classmethod
-    def from_xarray(cls: type[Tso], ts: Dataset) -> Tso:
+    def from_xarray(cls: Type[Tso], ts: Dataset) -> Tso:
         """Create a `StingrayObject` from data in an xarray Dataset.
 
         The dataset MUST contain at least a column named like the
@@ -535,7 +535,7 @@ class StingrayObject:
         return ts
 
     @classmethod
-    def from_pandas(cls: type[Tso], ts: DataFrame) -> Tso:
+    def from_pandas(cls: Type[Tso], ts: DataFrame) -> Tso:
         """Create an `StingrayObject` object from data in a pandas DataFrame.
 
         The dataframe MUST contain at least a column named like the
@@ -583,7 +583,7 @@ class StingrayObject:
         return cls
 
     @classmethod
-    def read(cls: type[Tso], filename: str, fmt: str = None) -> Tso:
+    def read(cls: Type[Tso], filename: str, fmt: str = None) -> Tso:
         r"""Generic reader for :class`StingrayObject`
 
         Currently supported formats are
@@ -1436,9 +1436,9 @@ class StingrayTimeseries(StingrayObject):
             A ``TimeSeries`` object with the array attributes as columns,
             and the meta attributes in the `meta` dictionary
         """
-        from astropy import units as u
-        from astropy.time import TimeDelta
         from astropy.timeseries import TimeSeries
+        from astropy.time import TimeDelta
+        from astropy import units as u
 
         data = {}
         array_attrs = self.array_attrs()
@@ -1951,7 +1951,7 @@ class StingrayTimeseries(StingrayObject):
 
         new_ts.gti = new_gti
 
-        dts = list({getattr(obj, "dt", None) for obj in all_objs})
+        dts = list(set([getattr(obj, "dt", None) for obj in all_objs]))
         if len(dts) != 1:
             warnings.warn("The time resolution is different. Transforming in array")
 

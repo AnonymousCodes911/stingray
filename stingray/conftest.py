@@ -5,6 +5,9 @@
 
 import os
 
+from astropy.version import version as astropy_version
+
+
 try:
     from pytest_astropy_header.display import PYTEST_HEADER_MODULES, TESTED_VERSIONS
 

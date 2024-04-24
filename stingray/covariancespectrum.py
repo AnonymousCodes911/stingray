@@ -1,15 +1,17 @@
+# -*- coding: utf-8 -*-
+
 from collections.abc import Iterable
 
 import numpy as np
 
-import stingray.utils as utils
 from stingray import Lightcurve
 from stingray.events import EventList
+import stingray.utils as utils
 
 __all__ = ["Covariancespectrum", "AveragedCovariancespectrum"]
 
 
-class Covariancespectrum:
+class Covariancespectrum(object):
     """
           Compute a covariance spectrum for the data. The input data can be
           either in event data or pre-made light curves. Event data can either

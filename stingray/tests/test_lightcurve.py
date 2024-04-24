@@ -1,17 +1,16 @@
-import copy
-import importlib
 import os
-import warnings
-
-import astropy.units as u
-import matplotlib.pyplot as plt
+import importlib
+import copy
 import numpy as np
 import pytest
-import scipy.stats
-from astropy.table import Table
+import warnings
+import matplotlib.pyplot as plt
+from numpy.testing import assert_allclose
+import astropy.units as u
 from astropy.time import Time
 from astropy.timeseries import TimeSeries
-from numpy.testing import assert_allclose
+from astropy.table import Table
+import scipy.stats
 
 from stingray import Lightcurve
 from stingray.exceptions import StingrayError
@@ -50,7 +49,7 @@ def evar_fun(lc):
     return excess_variance(lc, normalization="none")
 
 
-class TestProperties:
+class TestProperties(object):
     @classmethod
     def setup_class(cls):
         dt = 0.1
@@ -271,7 +270,7 @@ class TestProperties:
             setattr(lc, attr, 3)
 
 
-class TestChunks:
+class TestChunks(object):
     @classmethod
     def setup_class(cls):
         dt = 0.1
@@ -351,7 +350,7 @@ class TestChunks:
         assert np.allclose(nevar_err * mean**2, evar_err, rtol=0.01)
 
 
-class TestLightcurve:
+class TestLightcurve(object):
     @classmethod
     def setup_class(cls):
         cls.times = np.array([1, 2, 3, 4])
@@ -1435,7 +1434,7 @@ class TestLightcurve:
         assert "Input timeseries must contain at least" in str(excinfo.value)
 
 
-class TestLightcurveRebin:
+class TestLightcurveRebin(object):
     @classmethod
     def setup_class(cls):
         dt = 0.0001220703125
@@ -1604,7 +1603,7 @@ class TestLightcurveRebin:
 
 
 @pytest.mark.slow
-class TestBexvar:
+class TestBexvar(object):
     @classmethod
     def setup_class(cls):
         fname_data = os.path.join(datadir, "LightCurve_bexvar.fits")
@@ -1673,7 +1672,7 @@ class TestBexvar:
         assert np.isclose(scatt_lo_function, scatt_lo_result, rtol=0.1)
 
 
-class TestArraydt:
+class TestArraydt(object):
     @classmethod
     def setup_class(cls):
         cls.times = np.array([1, 3, 4, 7])

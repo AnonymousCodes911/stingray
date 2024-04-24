@@ -1,5 +1,4 @@
 import pickle
-
 import numpy as np
 
 """
@@ -8,7 +7,7 @@ transfer functions.
 """
 
 
-class TransferFunction:
+class TransferFunction(object):
     """
     Create or retrieve a transfer function, and form
     time and energy averaged responses.

@@ -1,32 +1,29 @@
 import copy
 import warnings
-from collections.abc import Generator, Iterable, Iterator
+from collections.abc import Iterable, Iterator, Generator
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 import scipy.optimize
 import scipy.stats
-from scipy.special import factorial
+import matplotlib.pyplot as plt
 
 from stingray.exceptions import StingrayError
 from stingray.utils import rebin_data, rebin_data_log, simon
 
 from .base import StingrayObject
 from .events import EventList
-from .fourier import (
-    avg_cs_from_iterables,
-    avg_cs_from_timeseries,
-    error_on_averaged_cross_spectrum,
-    get_flux_iterable_from_segments,
-    get_rms_from_unnorm_periodogram,
-    normalize_periodograms,
-    poisson_level,
-    raw_coherence,
-)
 from .gti import cross_two_gtis, time_intervals_from_gtis
 from .lightcurve import Lightcurve
+from .fourier import avg_cs_from_iterables, error_on_averaged_cross_spectrum
+from .fourier import avg_cs_from_timeseries, poisson_level
+from .fourier import normalize_periodograms, raw_coherence
+from .fourier import get_flux_iterable_from_segments
+from .fourier import get_rms_from_unnorm_periodogram
 from .power_colors import power_color
+
+from scipy.special import factorial
+
 
 __all__ = [
     "Crossspectrum",
@@ -2888,7 +2885,8 @@ def crossspectrum_from_lc_iterable(
                 flux_iterable = get_flux_iterable_from_segments(
                     lc.time, gti, segment_size, n_bin, fluxes=lc.counts, errors=err
                 )
-                yield from flux_iterable
+                for out in flux_iterable:
+                    yield out
             else:
                 yield lc
 

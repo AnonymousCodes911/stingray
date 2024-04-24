@@ -1,8 +1,7 @@
 import os
-
-import matplotlib.pyplot as plt
-import numpy as np
 import pytest
+import numpy as np
+import matplotlib.pyplot as plt
 
 try:
     import jax
@@ -23,15 +22,9 @@ try:
 except ImportError:
     _HAS_TINYGP = False
 
+from stingray.modeling.gpmodeling import get_kernel, get_mean, get_gp_params
+from stingray.modeling.gpmodeling import get_prior, get_log_likelihood, GPResult
 from stingray import Lightcurve
-from stingray.modeling.gpmodeling import (
-    GPResult,
-    get_gp_params,
-    get_kernel,
-    get_log_likelihood,
-    get_mean,
-    get_prior,
-)
 
 try:
     import tensorflow_probability.substrates.jax as tfp
@@ -42,7 +35,7 @@ except ImportError:
 
 try:
     import jaxns
-    from jaxns import ExactNestedSampler, Model, Prior, TerminationCondition
+    from jaxns import ExactNestedSampler, TerminationCondition, Prior, Model
 except ImportError:
     _HAS_JAXNS = False
 
@@ -55,7 +48,7 @@ def clear_all_figs():
 
 @pytest.mark.xfail
 @pytest.mark.skipif(not _HAS_TINYGP, reason="tinygp not installed")
-class Testget_kernel:
+class Testget_kernel(object):
     def setup_class(self):
         self.x = np.linspace(0, 1, 5)
         self.kernel_params = {"arn": 1.0, "aqpo": 1.0, "crn": 1.0, "cqpo": 1.0, "freq": 1.0}
@@ -99,7 +92,7 @@ class Testget_kernel:
             get_kernel("periodic", self.kernel_params)
 
 
-class Testget_mean:
+class Testget_mean(object):
     def setup_class(self):
         self.t = np.linspace(0, 5, 10)
         self.mean_params = {
@@ -176,7 +169,7 @@ class Testget_mean:
             get_mean("polynomial", self.mean_params)
 
 
-class Testget_gp_params:
+class Testget_gp_params(object):
     def setup_class(self):
         pass
 
@@ -247,7 +240,7 @@ class Testget_gp_params:
 @pytest.mark.skipif(
     not (_HAS_TINYGP and _HAS_TFP and _HAS_JAXNS), reason="tinygp, tfp or jaxns not installed"
 )
-class TestGPResult:
+class TestGPResult(object):
     def setup_class(self):
         self.Times = np.linspace(0, 1, 64)
         kernel_params = {

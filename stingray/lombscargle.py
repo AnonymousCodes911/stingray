@@ -1,13 +1,18 @@
+import copy
 import warnings
 from typing import Optional, Union
 
 import numpy as np
+import numpy.typing as npt
+from astropy.timeseries.periodograms import LombScargle
 
 from .crossspectrum import Crossspectrum
 from .events import EventList
+from .exceptions import StingrayError
 from .fourier import impose_symmetry_lsft, lsft_fast, lsft_slow
 from .lightcurve import Lightcurve
 from .utils import simon
+
 
 __all__ = ["LombScarglePowerspectrum", "LombScargleCrossspectrum"]
 
@@ -675,7 +680,7 @@ def _ls_cross(
         lsft1 = lsft_fast(lc1.counts, lc1.time, freq, oversampling=oversampling)
         lsft2 = lsft_fast(lc2.counts, lc2.time, freq, oversampling=oversampling)
     if fullspec:
-        lsft1, _ = impose_symmetry_lsft(lsft1, np.sum(lc1.counts), lc1.n, freq)
+        lsft1, _ = impose_symmetry_lsft(lsft1, np.sum((lc1.counts)), lc1.n, freq)
         lsft2, freq = impose_symmetry_lsft(lsft2, np.sum(lc2.counts), lc2.n, freq)
     cross = np.multiply(lsft1, np.conjugate(lsft2))
     return freq, cross

@@ -12,13 +12,14 @@ from .gti import (
     generate_indices_of_segment_boundaries_binned,
     generate_indices_of_segment_boundaries_unbinned,
 )
+
 from .utils import (
     fft,
     fftfreq,
-    fix_segment_size_to_integer_samples,
     histogram,
     show_progress,
     sum_if_not_none_or_initialize,
+    fix_segment_size_to_integer_samples,
 )
 
 
@@ -2311,7 +2312,7 @@ def lsft_fast(
     num_ww = len(freqs)
 
     # Arrays initialization
-    ft_real = ft_imag = np.zeros(num_ww)
+    ft_real = ft_imag = np.zeros((num_ww))
     f0, df, N = freqs[0], freqs[1] - freqs[0], len(freqs)
 
     # Sum (y_i * cos(wt - wtau))

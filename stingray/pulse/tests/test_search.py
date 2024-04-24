@@ -1,26 +1,22 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+import matplotlib.pyplot as plt
 
+from stingray.pulse import epoch_folding_search, z_n_search
+from stingray.pulse import phase_dispersion_search
+from stingray.pulse import phaseogram, plot_phaseogram
+from stingray.pulse.search import _profile_fast
+from stingray.pulse import plot_profile
+from stingray.pulse import fold_events
 from stingray import Lightcurve
 from stingray.events import EventList
-from stingray.pulse import (
-    epoch_folding_search,
-    fold_events,
-    phase_dispersion_search,
-    phaseogram,
-    plot_phaseogram,
-    plot_profile,
-    z_n_search,
-)
-from stingray.pulse.search import _profile_fast
 
 pytestmark = pytest.mark.slow
 
 np.random.seed(20150907)
 
 
-class TestAll:
+class TestAll(object):
     """Unit tests for the stingray.pulse.search module."""
 
     @classmethod

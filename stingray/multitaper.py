@@ -1,17 +1,20 @@
 import copy
+
+from stingray.gti import check_gtis, cross_two_gtis
+from stingray.fourier import normalize_periodograms
+from stingray.powerspectrum import Powerspectrum
 import warnings
 
 import numpy as np
-from astropy.timeseries import LombScargle
-from scipy import interpolate, signal
+import scipy.optimize
+import scipy.stats
+from scipy import signal, interpolate
 
-from stingray.fourier import normalize_periodograms
-from stingray.gti import check_gtis, cross_two_gtis
-from stingray.powerspectrum import Powerspectrum
+from astropy.timeseries import LombScargle
 
 from .events import EventList
 from .lightcurve import Lightcurve
-from .utils import rebin_data, rfft, rfftfreq, simon
+from .utils import rebin_data, simon, fft, rfft, rfftfreq
 
 __all__ = ["Multitaper"]
 

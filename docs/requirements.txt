@@ -1,7 +1,7 @@
-docutils
-ipython
 jinja2==3.1.3
+docutils
+sphinx-astropy
 nbsphinx>=0.8.3,!=0.8.8
 pandoc
-sphinx-astropy
+ipython
 towncrier<22.12.0

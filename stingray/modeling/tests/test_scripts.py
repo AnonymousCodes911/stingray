@@ -1,15 +1,14 @@
 import numpy as np
+
 from astropy.modeling import models
 
-from stingray import Crossspectrum, Powerspectrum
-from stingray.modeling.scripts import (
-    fit_crossspectrum,
-    fit_lorentzians,
-    fit_powerspectrum,
-)
+from stingray import Powerspectrum, Crossspectrum
+
+from stingray.modeling.scripts import fit_lorentzians
+from stingray.modeling.scripts import fit_powerspectrum, fit_crossspectrum
 
 
-class TestFitLorentzians:
+class TestFitLorentzians(object):
     @classmethod
     def setup_class(cls):
         np.random.seed(150)

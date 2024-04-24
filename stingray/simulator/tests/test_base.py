@@ -1,10 +1,10 @@
+from __future__ import division
+from stingray.simulator.base import simulate_times
+from stingray.lightcurve import Lightcurve
 import numpy as np
 
-from stingray.lightcurve import Lightcurve
-from stingray.simulator.base import simulate_times
 
-
-class TestSimulator:
+class TestSimulator(object):
     @classmethod
     def setup_class(self):
         self.time = [0.5, 1.5, 2.5, 3.5]

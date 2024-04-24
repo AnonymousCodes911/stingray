@@ -1,24 +1,15 @@
+import numpy as np
+from stingray.pulse import fold_events, get_TOA, phase_exposure
+from stingray.pulse import ef_profile_stat, z_n, pulse_phase
+from stingray.pulse import pdm_profile_stat
+from stingray.pulse import z_n, z_n_events, z_n_binned_events, z_n_gauss, htest
+from stingray.pulse import z_n_events_all, z_n_binned_events_all, z_n_gauss_all
+from stingray.pulse import get_orbital_correction_from_ephemeris_file, p_to_f
+from stingray.pulse import HAS_PINT
+import pytest
 import os
 import warnings
-
-import numpy as np
-import pytest
-
-from stingray.pulse import (
-    ef_profile_stat,
-    fold_events,
-    get_orbital_correction_from_ephemeris_file,
-    get_TOA,
-    htest,
-    p_to_f,
-    pdm_profile_stat,
-    phase_exposure,
-    pulse_phase,
-    z_n,
-    z_n_binned_events_all,
-    z_n_events_all,
-    z_n_gauss_all,
-)
+import matplotlib.pyplot as plt
 
 
 def _template_fun(phase, ph0, amplitude, baseline=0):
@@ -30,7 +21,7 @@ def test_p_to_f_warns():
         assert np.allclose(p_to_f(1, 2, 3, 4, 32, 22), [1, -2, 5, -16, 0, 0])
 
 
-class TestAll:
+class TestAll(object):
     """Unit tests for the stingray.pulsar module."""
 
     @classmethod
@@ -45,10 +36,10 @@ class TestAll:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=ResourceWarning)
 
-            import astropy.units as u
-            import pint.models.model_builder as mb
             import pint.toa as toa
             from pint.residuals import Residuals
+            import pint.models.model_builder as mb
+            import astropy.units as u
 
             parfile = os.path.join(self.datadir, "example_pint.par")
             timfile = os.path.join(self.datadir, "example_pint.tim")
@@ -337,7 +328,7 @@ class TestAll:
 
 
 def create_pulsed_events(nevents, freq, t0=0, t1=1000, nback=0):
-    from numpy.random import PCG64, Generator
+    from numpy.random import Generator, PCG64
 
     rg = Generator(PCG64())
     events = rg.normal(0.5, 0.1, nevents - nback)
@@ -356,7 +347,7 @@ def poissonize_gaussian_profile(prof, err):
     return (prof - prof.mean()) * factor + lam
 
 
-class TestZandH:
+class TestZandH(object):
     """Unit tests for the stingray.pulsar module."""
 
     @classmethod

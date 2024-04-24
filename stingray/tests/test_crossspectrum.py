@@ -1,34 +1,25 @@
-import copy
-import importlib
 import os
-import warnings
-
-import matplotlib.pyplot as plt
+import importlib
 import numpy as np
 import pytest
+import warnings
+import matplotlib.pyplot as plt
 import scipy.special
 from astropy.io import fits
-
-from stingray import (
-    AveragedCrossspectrum,
-    AveragedPowerspectrum,
-    Crossspectrum,
-    DynamicalCrossspectrum,
-    Lightcurve,
-    StingrayError,
-)
-from stingray.crossspectrum import (
-    coherence,
-    cospectra_pvalue,
-    crossspectrum_from_time_array,
-    normalize_crossspectrum,
-    normalize_crossspectrum_gauss,
-    time_lag,
-)
-from stingray.events import EventList
-from stingray.filters import filter_for_deadtime
-from stingray.fourier import poisson_level
+from stingray import Lightcurve
+from stingray import Crossspectrum, AveragedCrossspectrum, DynamicalCrossspectrum
+from stingray import AveragedPowerspectrum
+from stingray.crossspectrum import cospectra_pvalue, crossspectrum_from_time_array
+from stingray.crossspectrum import normalize_crossspectrum, normalize_crossspectrum_gauss
+from stingray.crossspectrum import coherence, time_lag
+from stingray import StingrayError
+from stingray.utils import HAS_NUMBA
 from stingray.simulator import Simulator
+from stingray.fourier import poisson_level
+from stingray.filters import filter_for_deadtime
+
+from stingray.events import EventList
+import copy
 
 _HAS_XARRAY = importlib.util.find_spec("xarray") is not None
 _HAS_PANDAS = importlib.util.find_spec("pandas") is not None
@@ -58,7 +49,7 @@ def avg_cdf_two_spectra(x):
     return prefac * (fac1 + fac2)
 
 
-class TestClassicalPvalue:
+class TestClassicalPvalue(object):
     def test_pval_returns_float_when_float_input(self):
         power = 1.0
         nspec = 1.0
@@ -156,7 +147,7 @@ class TestClassicalPvalue:
         assert np.isclose(cospectra_pvalue(power, nspec), pval_theory)
 
 
-class TestAveragedCrossspectrumEvents:
+class TestAveragedCrossspectrumEvents(object):
     def setup_class(self):
         tstart = 0.0
         tend = 1.0
@@ -476,7 +467,7 @@ class TestAveragedCrossspectrumEvents:
         assert np.iscomplexobj(new_cs.power_err[0])
 
 
-class TestCoherence:
+class TestCoherence(object):
     def test_coherence_is_one_on_single_interval(self):
         lc1 = Lightcurve([1, 2, 3, 4, 5], [2, 3, 2, 4, 1])
         lc2 = Lightcurve([1, 2, 3, 4, 5], [4, 8, 1, 9, 11])
@@ -502,7 +493,7 @@ class TestCoherence:
         assert np.isclose(np.mean(coh).real, 1.0, atol=0.01)
 
 
-class TestNormalization:
+class TestNormalization(object):
     def setup_class(self):
         tstart = 0.0
         self.tseg = 100000.0
@@ -652,7 +643,7 @@ class TestNormalization:
             power = self.cs_norm._normalize_crossspectrum(self.cs.unnorm_power)
 
 
-class TestCrossspectrum:
+class TestCrossspectrum(object):
     def setup_class(self):
         tstart = 0.0
         tend = 1.0
@@ -992,7 +983,7 @@ class TestCrossspectrum:
         assert csT.freq[csT.n // 2] <= 0.0
 
 
-class TestAveragedCrossspectrum:
+class TestAveragedCrossspectrum(object):
     def setup_class(self):
         tstart = 0.0
         tend = 1.0
@@ -1288,7 +1279,7 @@ class TestAveragedCrossspectrum:
         assert np.isclose(np.std(cs.power.real), np.sqrt(2 / (tmax / segment_size)), rtol=0.1)
 
 
-class TestCoherenceFunction:
+class TestCoherenceFunction(object):
     def setup_class(self):
         self.lc1 = Lightcurve([1, 2, 3, 4, 5], [2, 3, 2, 4, 1])
         self.lc2 = Lightcurve([1, 2, 3, 4, 5], [4, 8, 1, 9, 11])
@@ -1319,7 +1310,7 @@ class TestCoherenceFunction:
         assert np.isclose(np.abs(np.mean(coh)), 1, rtol=0.001)
 
 
-class TestTimelagFunction:
+class TestTimelagFunction(object):
     def setup_class(self):
         self.lc1 = Lightcurve([1, 2, 3, 4, 5], [2, 3, 2, 4, 1])
         self.lc2 = Lightcurve([1, 2, 3, 4, 5], [4, 8, 1, 9, 11])
@@ -1416,7 +1407,7 @@ class TestRoundTrip:
         self._check_equal(so, new_so)
 
 
-class TestDynamicalCrossspectrum:
+class TestDynamicalCrossspectrum(object):
     def setup_class(cls):
         # generate timestamps
         timestamps = np.arange(0.005, 100.01, 0.01)

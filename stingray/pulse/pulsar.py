@@ -4,16 +4,17 @@ Basic pulsar-related functions and statistics.
 
 import functools
 import math
-import warnings
 from collections.abc import Iterable
-
-import matplotlib.pyplot as plt
-import numpy as np
+import warnings
+from scipy.optimize import minimize, basinhopping
 import scipy.stats
+import numpy as np
+import matplotlib.pyplot as plt
 
-from ..utils import jit, simon
-from . import HAS_PINT, get_model, toa
 from .fftfit import fftfit as taylor_fftfit
+from ..utils import simon, jit
+from . import HAS_PINT, get_model, toa
+
 
 __all__ = [
     "pulse_phase",
@@ -766,9 +767,8 @@ def _plot_TOA_fit(
     profile, template, toa, mod=None, toaerr=None, additional_phase=0.0, show=True, period=1
 ):
     """Plot diagnostic information on the TOA."""
-    import time
-
     from scipy.interpolate import interp1d
+    import time
 
     phases = np.arange(0, 2, 1 / len(profile))
     profile = np.concatenate((profile, profile))
@@ -789,7 +789,7 @@ def _plot_TOA_fit(
     plt.axvline(toa / period - 0.5 / len(profile), ls="--")
     plt.axvline(toa / period + 0.5 / len(profile), ls="--")
     timestamp = int(time.time())
-    plt.savefig(f"{timestamp}.png")
+    plt.savefig("{}.png".format(timestamp))
     if not show:
         plt.close(fig)
 
@@ -893,8 +893,8 @@ def get_orbital_correction_from_ephemeris_file(
     correction_mjd : function
         Function that accepts times in MJDs and returns the deorbited times.
     """
-    from astropy import units
     from scipy.interpolate import interp1d
+    from astropy import units
 
     if not HAS_PINT:
         raise ImportError(

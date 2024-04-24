@@ -1,23 +1,19 @@
-import copy
-import importlib
 import os
-import warnings
-
-import matplotlib.pyplot as plt
 import numpy as np
-import pytest
-from astropy.io import fits
-from astropy.modeling.models import Lorentz1D
+import copy
+import warnings
+import importlib
 
-from stingray import (
-    AveragedPowerspectrum,
-    DynamicalPowerspectrum,
-    Lightcurve,
-    Powerspectrum,
-)
+import pytest
+import matplotlib.pyplot as plt
+from astropy.io import fits
+from stingray import Lightcurve
 from stingray.events import EventList
-from stingray.filters import filter_for_deadtime
+from stingray.utils import HAS_NUMBA
+from stingray import Powerspectrum, AveragedPowerspectrum, DynamicalPowerspectrum
 from stingray.powerspectrum import powerspectrum_from_time_array
+from astropy.modeling.models import Lorentz1D
+from stingray.filters import filter_for_deadtime
 
 _HAS_XARRAY = importlib.util.find_spec("xarray") is not None
 _HAS_PANDAS = importlib.util.find_spec("pandas") is not None
@@ -36,7 +32,7 @@ curdir = os.path.abspath(os.path.dirname(__file__))
 datadir = os.path.join(curdir, "data")
 
 
-class TestAveragedPowerspectrumEvents:
+class TestAveragedPowerspectrumEvents(object):
     @classmethod
     def setup_class(cls):
         tstart = 0.0
@@ -367,7 +363,7 @@ class TestAveragedPowerspectrumEvents:
         assert np.isclose(np.std(pds.power), 2 / np.sqrt(tmax / segment_size), rtol=0.1)
 
 
-class TestPowerspectrum:
+class TestPowerspectrum(object):
     @classmethod
     def setup_class(cls):
         tstart = 0.0
@@ -638,7 +634,7 @@ class TestPowerspectrum:
         assert pval.shape[0] == 2
 
 
-class TestAveragedPowerspectrum:
+class TestAveragedPowerspectrum(object):
     @classmethod
     def setup_class(cls):
         tstart = 0.0
@@ -859,7 +855,7 @@ class TestAveragedPowerspectrum:
         assert np.isclose(np.std(ps.power), 2.0 / np.sqrt(n * 10), atol=0.1, rtol=0.1)
 
 
-class TestDynamicalPowerspectrum:
+class TestDynamicalPowerspectrum(object):
     def setup_class(cls):
         # generate timestamps
         timestamps = np.arange(0.005, 100.01, 0.01)
@@ -1095,7 +1091,7 @@ class TestRoundTrip:
         self._check_equal(so, new_so)
 
 
-class TestRMS:
+class TestRMS(object):
     @classmethod
     def setup_class(cls):
         fwhm = 0.23456

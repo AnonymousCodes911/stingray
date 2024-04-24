@@ -1,12 +1,10 @@
-import copy
-import importlib
 import os
-
-import matplotlib.pyplot as plt
-import numpy as np
+import importlib
+import copy
 import pytest
+import numpy as np
+import matplotlib.pyplot as plt
 from astropy.table import Table
-
 from stingray.base import StingrayObject, StingrayTimeseries
 
 _HAS_XARRAY = importlib.util.find_spec("xarray") is not None
@@ -1308,7 +1306,7 @@ class TestJoinEvents:
         assert ts_new.mission == (1, 2)
 
 
-class TestFillBTI:
+class TestFillBTI(object):
     @classmethod
     def setup_class(cls):
         cls.rand_time = np.sort(np.random.uniform(0, 1000, 100000))
@@ -1450,7 +1448,7 @@ class TestFillBTI:
         assert np.allclose(lc_new.gti, self.gti)
 
 
-class TestAnalyzeChunks:
+class TestAnalyzeChunks(object):
     @classmethod
     def setup_class(cls):
         cls.time = np.arange(150)

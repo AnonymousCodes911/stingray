@@ -1,18 +1,20 @@
 import warnings
-
-import matplotlib.pyplot as plt
 import numpy as np
-from astropy.table import Table
+import scipy
+import matplotlib.pyplot as plt
+
 from scipy.ndimage import gaussian_filter1d
+from scipy.interpolate import UnivariateSpline
+from astropy.table import Table
 
 from stingray.lightcurve import Lightcurve
 from stingray.loggingconfig import setup_logger
-
 from ..crossspectrum import AveragedCrossspectrum, get_flux_generator
-from ..fourier import fft, fftfreq, normalize_periodograms, positive_fft_bins
-from ..gti import cross_two_gtis
 from ..powerspectrum import AveragedPowerspectrum
+from ..fourier import normalize_periodograms, fft, fftfreq, positive_fft_bins
 from ..utils import show_progress
+from ..gti import cross_two_gtis
+
 
 __all__ = ["calculate_FAD_correction", "get_periodograms_from_FAD_results", "FAD"]
 
@@ -178,7 +180,7 @@ def FAD(
         if smoothing_alg == "gauss":
             smooth_real = gaussian_filter1d(fourier_diff.real**2, smoothing_length)
         else:
-            raise ValueError(f"Unknown smoothing algorithm: {smoothing_alg}")
+            raise ValueError("Unknown smoothing algorithm: {}".format(smoothing_alg))
 
         p1 = (f1 * f1.conj()).real
         p1 = p1 / smooth_real * 2

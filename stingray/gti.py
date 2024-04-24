@@ -1,22 +1,16 @@
-import copy
 import re
+import numpy as np
 import warnings
 from collections.abc import Iterable
+import copy
 
-import numpy as np
 from astropy.io import fits
-
+from .utils import contiguous_regions, jit, HAS_NUMBA
+from .utils import assign_value_if_none, apply_function_if_none
+from .utils import check_iterables_close, is_sorted
 from stingray.exceptions import StingrayError
 from stingray.loggingconfig import setup_logger
 
-from .utils import (
-    HAS_NUMBA,
-    apply_function_if_none,
-    assign_value_if_none,
-    contiguous_regions,
-    is_sorted,
-    jit,
-)
 
 __all__ = [
     "load_gtis",
@@ -279,8 +273,8 @@ def get_gti_from_all_extensions(lchdulist, accepted_gtistrings=["GTI"], det_numb
     acc_gti_strs = copy.deepcopy(accepted_gtistrings)
     if det_numbers is not None:
         for i in det_numbers:
-            acc_gti_strs += [x + f"{i:02d}" for x in accepted_gtistrings]
-            acc_gti_strs += [x + f"{i:02d}.*" for x in accepted_gtistrings]
+            acc_gti_strs += [x + "{:02d}".format(i) for x in accepted_gtistrings]
+            acc_gti_strs += [x + "{:02d}.*".format(i) for x in accepted_gtistrings]
     gtiextn = []
     for pattern in acc_gti_strs:
         gtiextn.extend(get_gti_extensions_from_pattern(lchdulist, pattern))
@@ -1567,7 +1561,8 @@ def generate_indices_of_gti_boundaries(times, gti, dt=0):
     times = np.asarray(times)
     startidx, stopidx = gti_border_bins(gti, times, dt=dt)
 
-    yield from zip(gti[:, 0], gti[:, 1], startidx, stopidx)
+    for s, e, idx0, idx1 in zip(gti[:, 0], gti[:, 1], startidx, stopidx):
+        yield s, e, idx0, idx1
 
 
 def generate_indices_of_segment_boundaries_unbinned(times, gti, segment_size, check_sorted=True):
@@ -1638,11 +1633,12 @@ def generate_indices_of_segment_boundaries_unbinned(times, gti, segment_size, ch
     )
 
     idxs = np.searchsorted(times, all_times)
-    idx_dict = {s: a for s, a in zip(all_times, idxs)}
+    idx_dict = dict([(s, a) for s, a in zip(all_times, idxs)])
     startidx = np.asarray([idx_dict[s] for s in start])
     stopidx = np.asarray([idx_dict[s] for s in stop])
 
-    yield from zip(start, stop, startidx, stopidx)
+    for s, e, idx0, idx1 in zip(start, stop, startidx, stopidx):
+        yield s, e, idx0, idx1
 
 
 def generate_indices_of_segment_boundaries_binned(times, gti, segment_size, dt=None):

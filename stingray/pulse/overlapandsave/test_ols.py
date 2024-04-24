@@ -1,8 +1,9 @@
-import numpy as np
 import pytest
+import numpy as np
 from scipy.signal import fftconvolve
+from .ols import prepareh, olsStep, ols, nextprod
 
-from .ols import nextprod, ols, olsStep, prepareh
+from stingray.utils import fft, fftfreq, fftn, ifftn, HAS_PYFFTW
 
 
 @pytest.mark.skipif("not HAS_PYFFTW")

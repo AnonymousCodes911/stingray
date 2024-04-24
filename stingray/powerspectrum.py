@@ -6,24 +6,19 @@ import scipy
 import scipy.optimize
 import scipy.stats
 
-from stingray.crossspectrum import (
-    AveragedCrossspectrum,
-    Crossspectrum,
-    DynamicalCrossspectrum,
-)
-from stingray.stats import amplitude_upper_limit, pds_probability
+from stingray.crossspectrum import AveragedCrossspectrum, Crossspectrum, DynamicalCrossspectrum
+from stingray.stats import pds_probability, amplitude_upper_limit
 
 from .events import EventList
-from .fourier import (
-    avg_pds_from_iterable,
-    avg_pds_from_timeseries,
-    get_flux_iterable_from_segments,
-    get_rms_from_unnorm_periodogram,
-    poisson_level,
-    unnormalize_periodograms,
-)
 from .gti import cross_two_gtis, time_intervals_from_gtis
+
 from .lightcurve import Lightcurve
+from .fourier import avg_pds_from_iterable, unnormalize_periodograms
+from .fourier import avg_pds_from_timeseries
+from .fourier import get_flux_iterable_from_segments
+from .fourier import poisson_level
+from .fourier import get_rms_from_unnorm_periodogram
+
 
 __all__ = ["Powerspectrum", "AveragedPowerspectrum", "DynamicalPowerspectrum"]
 
@@ -1488,7 +1483,8 @@ def powerspectrum_from_lc_iterable(
                 flux_iterable = get_flux_iterable_from_segments(
                     lc.time, gti, segment_size, n_bin, fluxes=lc.counts, errors=err
                 )
-                yield from flux_iterable
+                for out in flux_iterable:
+                    yield out
             elif isinstance(lc, Iterable):
                 yield lc
             else:

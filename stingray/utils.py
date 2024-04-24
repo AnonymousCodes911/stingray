@@ -1,8 +1,12 @@
-import copy
 import numbers
+import os
 import re
-import tempfile
+import copy
+import random
+import string
+import sys
 import warnings
+import tempfile
 from collections.abc import Iterable
 
 import numpy as np
@@ -10,7 +14,6 @@ import scipy
 from numpy import histogram as histogram_np
 from numpy import histogram2d as histogram2d_np
 from numpy import histogramdd as histogramdd_np
-
 from .loggingconfig import setup_logger
 
 logger = setup_logger()
@@ -18,13 +21,13 @@ logger = setup_logger()
 try:
     import pyfftw
     from pyfftw.interfaces.numpy_fft import (
+        ifft,
         fft,
-        fft2,
         fftfreq,
         fftn,
-        fftshift,
-        ifft,
         ifftn,
+        fftshift,
+        fft2,
         ifftshift,
         rfft,
         rfftfreq,
@@ -34,6 +37,7 @@ try:
     HAS_PYFFTW = True
     logger.info("Using PyFFTW")
 except ImportError:
+    from numpy.fft import ifft, fft, fftfreq, fftn, ifftn, fftshift, fft2, ifftshift, rfft, rfftfreq
 
     HAS_PYFFTW = False
 
@@ -44,8 +48,8 @@ try:
     from numba import jit
 
     HAS_NUMBA = True
-    from numba import float32, float64, int32, int64, njit, prange, vectorize
-    from numba.core.errors import NumbaNotImplementedError, NumbaValueError, TypingError
+    from numba import njit, prange, vectorize, float32, float64, int32, int64
+    from numba.core.errors import NumbaValueError, NumbaNotImplementedError, TypingError
 except ImportError:
     warnings.warn("Numba not installed. Faking it")
     HAS_NUMBA = False
@@ -417,7 +421,7 @@ def simon(message, **kwargs):
         The rest of the arguments that are passed to ``warnings.warn``
     """
 
-    warnings.warn(f"SIMON says: {message}", **kwargs)
+    warnings.warn("SIMON says: {0}".format(message), **kwargs)
 
 
 def rebin_data(x, y, dx_new, yerr=None, method="sum", dx=None):
@@ -805,7 +809,7 @@ def order_list_of_arrays(data, order):
     data : list or dict
     """
     if hasattr(data, "items"):
-        data = {key: value[order] for key, value in data.items()}
+        data = dict([(key, value[order]) for key, value in data.items()])
     elif is_iterable(data):
         data = [i[order] for i in data]
     else:
@@ -1210,7 +1214,7 @@ def create_window(N, window_type="uniform"):
 
     # Constants
     N_minus_1 = N - 1
-    N_by_2 = int(np.floor((N_minus_1) / 2))
+    N_by_2 = int((np.floor((N_minus_1) / 2)))
 
     # Create Windows
     if window_type == "uniform":
@@ -1218,7 +1222,7 @@ def create_window(N, window_type="uniform"):
 
     if window_type == "parzen":
         N_parzen = int(np.ceil((N + 1) / 2))
-        N2_plus_1 = int(np.floor(N_parzen / 2)) + 1
+        N2_plus_1 = int(np.floor((N_parzen / 2))) + 1
 
         window = np.zeros(N_parzen)
         windlag0 = np.arange(0, N2_plus_1) / (N_parzen - 1)
@@ -1457,7 +1461,7 @@ def check_allclose_and_print(
     """
     try:
         assert np.allclose(v1, v2, rtol, atol)
-    except Exception:
+    except Exception as e:
         v1 = np.asarray(v1)
         v2 = np.asarray(v2)
         bad = np.abs(v1 - v2) >= (atol + rtol * np.abs(v2))

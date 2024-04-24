@@ -1,10 +1,8 @@
-from collections.abc import Iterable
-
 import matplotlib.pyplot as plt
-import numpy as np
 from scipy.interpolate import interp1d
-
+import numpy as np
 from .fourier import integrate_power_in_frequency_range
+from collections.abc import Iterable
 
 DEFAULT_COLOR_CONFIGURATION = {
     "center": [4.51920, 0.453724],

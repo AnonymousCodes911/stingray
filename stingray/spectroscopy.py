@@ -1,12 +1,13 @@
 import numpy as np
-from astropy.modeling.models import Lorentz1D
-from astropy.table import Table
-from scipy.optimize import brent
 from scipy.stats import binned_statistic
+from scipy.optimize import brent
 
-from stingray import Crossspectrum, Lightcurve
+
+from astropy.table import Table
+from astropy.modeling.models import Lorentz1D
+from stingray import Lightcurve, Crossspectrum
+from stingray.utils import standard_error, find_nearest, fft, ifft
 from stingray.filters import Optimal1D, Window1D
-from stingray.utils import fft, find_nearest, ifft, standard_error
 
 
 def load_lc_fits(file, counts_type=True):

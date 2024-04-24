@@ -8,15 +8,16 @@ import warnings
 
 import numpy as np
 
-from stingray.loggingconfig import setup_logger
 from stingray.utils import _int_sum_non_zero
+from stingray.loggingconfig import setup_logger
 
 from .base import StingrayTimeseries
 from .filters import get_deadtime_mask
 from .gti import generate_indices_of_boundaries
 from .io import load_events_and_gtis, pi_to_energy
 from .lightcurve import Lightcurve
-from .utils import histogram, njit, simon
+from .utils import simon, njit
+from .utils import histogram
 
 __all__ = ["EventList"]
 
@@ -331,7 +332,7 @@ class EventList(StingrayTimeseries):
                 attr_dict[attr] = histogram(
                     self.time, bins=nbins, weights=getattr(self, attr), range=ranges
                 )
-        meta_attrs = {attr: getattr(self, attr) for attr in self.meta_attrs()}
+        meta_attrs = dict((attr, getattr(self, attr)) for attr in self.meta_attrs())
         new_ts = StingrayTimeseries(times, array_attrs=attr_dict, **meta_attrs)
         new_ts.dt = dt
         return new_ts
